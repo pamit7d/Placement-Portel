@@ -4,3 +4,4 @@ Flask-Login==0.6.2
 Flask-WTF==1.2.1
 Werkzeug==2.3.8
 email-validator==2.1.0.post1
+blinker==1.7.0

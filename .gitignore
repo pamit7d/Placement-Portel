@@ -10,12 +10,14 @@ venv/
 env/
 
 # Flask Instance Folder
-instance/
+# instance/
+instance/*.db
+!instance/.gitkeep
 
 # Environment and Database
 .env
 *.sqlite3
-*.db
+# *.db
 
 # Uploads and Data
 static/uploads/*
