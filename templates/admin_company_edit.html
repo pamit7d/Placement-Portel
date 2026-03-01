@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Admin</span>Panel
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('admin.manage_students') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_students' or request.endpoint == 'admin.view_student' or request.endpoint == 'admin.edit_student' %}active{% endif %}">
+            Manage Students
+        </a>
+        <a href="{{ url_for('admin.manage_companies') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_companies' or request.endpoint == 'admin.view_company' or request.endpoint == 'admin.edit_company' %}active{% endif %}">
+            Manage Companies
+        </a>
+        <a href="{{ url_for('admin.manage_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_drives' or request.endpoint == 'admin.view_drive' %}active{% endif %}">
+            Manage Drives
+        </a>
+        <a href="{{ url_for('admin.all_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.all_applications' or request.endpoint == 'admin.view_application' or request.endpoint == 'admin.edit_application' %}active{% endif %}">
+            All Applications
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('admin.view_company', id=company.id) }}"
+                    class="btn btn-sm btn-light border d-flex align-items-center justify-content-center pt-2 pb-2"
+                    style="width: 40px; border-radius: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                </a>
+                <h4 class="mb-0 fw-bold" style="color: var(--secondary);">Edit Company Profile</h4>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">Admin</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="row w-100 m-0">
+            <div class="col-lg-8 col-md-10 p-0">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary"
+                                style="width: 48px; height: 48px;">
+                                <span class="material-symbols-outlined" style="font-size: 24px;">business</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0 text-secondary">Update Information</h5>
+                                <p class="text-muted small mb-0">Modify company details below</p>
+                            </div>
+                        </div>
+
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-12">
+                                    <label class="form-label text-muted small fw-bold">Company Name <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted">
+                                            <i class="bi bi-building"></i>
+                                        </span>
+                                        <input type="text" name="company_name"
+                                            class="form-control input-field border-start-0 ps-0"
+                                            value="{{ company.company_name }}" required
+                                            placeholder="Enter company name">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">HR Contact Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted">
+                                            <i class="bi bi-person"></i>
+                                        </span>
+                                        <input type="text" name="hr_name"
+                                            class="form-control input-field border-start-0 ps-0"
+                                            value="{{ company.hr_name or '' }}"
+                                            placeholder="Enter HR representative's name">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">HR Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted">
+                                            <i class="bi bi-envelope"></i>
+                                        </span>
+                                        <input type="email" name="hr_email"
+                                            class="form-control input-field border-start-0 ps-0"
+                                            value="{{ company.hr_email or '' }}" placeholder="Enter contact email">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">Contact Phone</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted">
+                                            <i class="bi bi-telephone"></i>
+                                        </span>
+                                        <input type="tel" name="hr_phone"
+                                            class="form-control input-field border-start-0 ps-0"
+                                            value="{{ company.hr_phone or '' }}" placeholder="Enter phone number">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small fw-bold">Company Website</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted">
+                                            <i class="bi bi-globe"></i>
+                                        </span>
+                                        <input type="url" name="website"
+                                            class="form-control input-field border-start-0 ps-0"
+                                            value="{{ company.website or '' }}" placeholder="https://example.com">
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label text-muted small fw-bold">Company Description</label>
+                                    <textarea name="description" class="form-control custom-textarea p-3" rows="5"
+                                        placeholder="Provide details about the company, its mission, and culture...">{{ company.description or '' }}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3 justify-content-end pt-3 border-top mt-4">
+                                <a href="{{ url_for('admin.view_company', id=company.id) }}"
+                                    class="btn btn-light fw-bold px-4" style="border-radius: 8px;">Cancel</a>
+                                <button type="submit"
+                                    class="btn btn-primary d-flex align-items-center gap-2 shadow-sm px-4"
+                                    style="border-radius: 8px; font-weight: 600;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Save
+                                    Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

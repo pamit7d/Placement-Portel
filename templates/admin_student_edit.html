@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <div class="main-content flex-grow-1" style="background-color: var(--light-bg); min-height: 100vh;">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('admin.view_student', id=student.id) }}"
+                    class="btn btn-sm btn-light border d-flex align-items-center justify-content-center pt-2 pb-2"
+                    style="width: 40px; border-radius: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                </a>
+                <h4 class="mb-0 fw-bold" style="color: var(--secondary);">Edit Student Profile</h4>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">Admin</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="container-fluid py-2">
+            <div class="card p-0 shadow-sm border-0 rounded-4 mb-5"
+                style="max-width: 900px; margin: 0 auto; overflow: hidden;">
+                <!-- Header Area -->
+                <div class="bg-primary bg-opacity-10 px-4 py-4 px-md-5 py-md-5 position-relative border-bottom"
+                    style="border-color: rgba(67, 97, 238, 0.1) !important;">
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-primary fw-bold border"
+                            style="width: 80px; height: 80px; font-size: 28px;">
+                            {{ student.full_name[:1] | upper }}
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-1 text-secondary" style="font-size: 1.8rem; letter-spacing: -0.5px;">
+                                {{ student.full_name }}</h3>
+                            <h6 class="mb-0 text-muted d-flex align-items-center gap-2">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">badge</span> {{
+                                student.roll_no }}
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" class="p-4 p-md-5 bg-white">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Personal Information -->
+                    <div class="mb-5">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                            <span class="material-symbols-outlined text-primary" style="font-size: 22px;">person</span>
+                            Personal Information
+                        </h6>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase"
+                                    style="letter-spacing: 0.5px;">Full Name <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    <input type="text" name="full_name"
+                                        class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                        value="{{ student.full_name }}" required placeholder="Enter full name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase"
+                                    style="letter-spacing: 0.5px;">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-telephone"></i>
+                                    </span>
+                                    <input type="tel" name="phone"
+                                        class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                        value="{{ student.phone or '' }}" placeholder="Enter phone number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Details -->
+                    <div class="mb-5">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                            <span class="material-symbols-outlined text-primary" style="font-size: 22px;">school</span>
+                            Academic Details
+                        </h6>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase"
+                                    style="letter-spacing: 0.5px;">Roll Number <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-hash"></i>
+                                    </span>
+                                    <input type="text" name="roll_no"
+                                        class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                        value="{{ student.roll_no }}" required placeholder="Enter roll number">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase"
+                                    style="letter-spacing: 0.5px;">Branch</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-diagram-project"></i>
+                                    </span>
+                                    <input type="text" name="branch"
+                                        class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                        value="{{ student.branch }}" placeholder="e.g. Computer Science">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 d-flex align-items-start">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase"
+                                    style="letter-spacing: 0.5px;">Year</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-calendar"></i>
+                                    </span>
+                                    <select name="year"
+                                        class="form-select input-field border-start-0 ps-0 bg-light-focus cursor-pointer"
+                                        style="height: 48px;">
+                                        <option value="" {% if not student.year %}selected{% endif %}>Select Year
+                                        </option>
+                                        <option value="1st Year" {% if student.year=='1st Year' %}selected{% endif %}>
+                                            1st Year</option>
+                                        <option value="2nd Year" {% if student.year=='2nd Year' %}selected{% endif %}>
+                                            2nd Year</option>
+                                        <option value="3rd Year" {% if student.year=='3rd Year' %}selected{% endif %}>
+                                            3rd Year</option>
+                                        <option value="4th Year" {% if student.year=='4th Year' %}selected{% endif %}>
+                                            4th Year</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase"
+                                    style="letter-spacing: 0.5px;">CGPA</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-warning">
+                                        <i class="bi bi-star-fill"></i>
+                                    </span>
+                                    <input type="number" step="0.01" min="0" max="10" name="cgpa"
+                                        class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                        value="{{ student.cgpa or '' }}" placeholder="Enter CGPA out of 10">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="mb-2">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                            <span class="material-symbols-outlined text-primary"
+                                style="font-size: 22px;">psychology</span> Additional Skills & Info
+                        </h6>
+
+                        <div>
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Skills <span
+                                    class="text-lowercase text-muted fw-normal">(comma separated)</span></label>
+                            <textarea name="skills" class="form-control custom-textarea bg-light-focus" rows="3"
+                                placeholder="e.g. Python, React, Machine Learning, Data Structures">{{ student.skills or '' }}</textarea>
+                            <div class="form-text mt-2"><i class="bi bi-info-circle"></i> Add skills separated by commas
+                                to help track student proficiencies.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
+                        <a href="{{ url_for('admin.view_student', id=student.id) }}"
+                            class="btn btn-light border px-4 py-2"
+                            style="border-radius: 8px; font-weight: 500;">Cancel</a>
+                        <button type="submit"
+                            class="btn btn-primary shadow-sm px-4 py-2 d-flex align-items-center gap-2"
+                            style="border-radius: 8px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

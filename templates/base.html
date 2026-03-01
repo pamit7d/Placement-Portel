@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+    {% block layout %}
+    <!-- Default layout with top navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('index') }}"
+                style="color: var(--primary);">
+                <div class="rounded-2 me-2 d-flex align-items-center justify-content-center text-white"
+                    style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--secondary) 0%, #007BB5 100%); font-size: 1rem;">
+                    <i class="bi bi-briefcase-fill"></i>R
+                </div>
+                <span style="color: var(--secondary);">Recruit</span>Plus
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'student' %}
+                    <li class="nav-item"><a class="nav-link fw-semibold"
+                            href="{{ url_for('student.dashboard') }}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#">Browse Drives</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#">My Applications</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="#">Profile</a></li>
+                    {% endif %}
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="{{ url_for('index') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="{{ url_for('about') }}">About</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="{{ url_for('contact') }}">Contact</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.logout') }}" class="btn-outline px-4 py-2"
+                        style="border-radius: 50px;">Logout</a>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn-outline px-4 py-2"
+                        style="border-radius: 50px; font-weight: 600;">Login</a>
+                    <div class="dropdown">
+                        <button class="btn-primary dropdown-toggle px-4 py-2 text-white fw-bold"
+                            style="border-radius: 50px;" type="button" data-bs-toggle="dropdown">
+                            Register
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                            <li><a class="dropdown-item py-2" href="{{ url_for('auth.register_student') }}">👩‍🎓 As
+                                    Student</a></li>
+                            <li><a class="dropdown-item py-2" href="{{ url_for('auth.register_company') }}">🏢 As
+                                    Company</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Simple footer for pages with navbar -->
+    <footer class="mt-5 py-4" style="background-color: var(--dark); color: var(--white);">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2026 RecruitPlus. All rights reserved.</p>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <!-- No JavaScript included per user requirements -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

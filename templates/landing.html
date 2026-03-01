@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<!-- Override default layout to have full width hero and specific footer -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('index') }}"
+            style="color: var(--primary);">
+            <div class="rounded-2 me-2 d-flex align-items-center justify-content-center text-white"
+                style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--secondary) 0%, #007BB5 100%); font-size: 1rem;">
+                <i class="bi bi-briefcase-fill"></i>R
+            </div>
+            <span style="color: var(--secondary);">Recruit</span>Plus
+        </a>
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link fw-semibold" href="{{ url_for('index') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link fw-semibold" href="{{ url_for('about') }}">About</a></li>
+                <li class="nav-item"><a class="nav-link fw-semibold" href="{{ url_for('contact') }}">Contact</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('auth.logout') }}" class="btn-outline px-4 py-2"
+                    style="border-radius: 50px;">Logout</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-outline px-4 py-2"
+                    style="border-radius: 50px; font-weight: 600;">Login</a>
+                <div class="dropdown">
+                    <button class="btn-primary dropdown-toggle px-4 py-2 text-white fw-bold"
+                        style="border-radius: 50px;" type="button" data-bs-toggle="dropdown">
+                        Register
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.register_student') }}">👩‍🎓 As
+                                Student</a></li>
+                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.register_company') }}">🏢 As
+                                Company</a></li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="container mt-4">
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+
+<header class="relative overflow-hidden hero-gradient px-4 py-5 text-center"
+    style="padding-top: 6rem !important; padding-bottom: 6rem !important;">
+    <div class="container d-flex flex-column gap-4 align-items-center"
+        style="max-width: 800px; position: relative; z-index: 2;">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white text-white fw-semibold"
+            style="background: rgba(255,255,255,0.2) !important; backdrop-filter: blur(4px); font-size: 14px;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">rocket_launch</span>
+            Next Gen Recruitment
+        </div>
+        <h1 class="display-4 fw-black mb-2" style="font-weight: 900; letter-spacing: -0.03em;">Streamline Your Campus
+            Placements</h1>
+        <p class="lead mb-4" style="font-size: 18px; color: rgba(255,255,255,0.9); max-width: 600px;">
+            Connecting top-tier students, global companies, and administrators for a seamless, digital-first recruitment
+            experience.
+        </p>
+        <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
+            <a href="{{ url_for('auth.register_student') }}"
+                class="btn btn-light px-4 py-3 rounded-3 fw-bold shadow js-hover-scale"
+                style="color: var(--primary); font-size: 16px;">
+                <span class="material-symbols-outlined align-middle me-2">school</span>Register as Student</a>
+            <a href="{{ url_for('auth.register_company') }}"
+                class="btn btn-outline-light px-4 py-3 rounded-3 fw-bold js-hover-scale"
+                style="border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); cursor: pointer;">
+                <span class="material-symbols-outlined align-middle me-2">business</span>Register as Company</a>
+        </div>
+    </div>
+
+    <!-- Decorative Elements -->
+    <div class="position-absolute rounded-circle"
+        style="bottom: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); filter: blur(40px); pointer-events: none;">
+    </div>
+    <div class="position-absolute rounded-circle"
+        style="top: -50px; right: -50px; width: 250px; height: 250px; background: rgba(247,179,43,0.2); filter: blur(40px); pointer-events: none;">
+    </div>
+</header>
+
+<main class="py-5" style="background: var(--light-gray);">
+    <div class="container mt-5 mb-5 d-flex flex-column gap-5">
+        <div class="text-center d-flex flex-column gap-2 mb-4">
+            <h3 class="fw-bold text-uppercase tracking-widest m-0"
+                style="color: var(--primary); font-size: 14px; letter-spacing: 0.1em;">Our Ecosystem</h3>
+            <h2 class="display-6 fw-extrabold m-0" style="font-weight: 800; color: #0f172a;">Empowering Stakeholders
+            </h2>
+            <p class="text-muted mx-auto" style="font-size: 15px; max-width: 400px;">Tailored tools for every stage of
+                the recruitment lifecycle.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 feature-card stitch-card">
+                    <div class="d-flex align-items-start gap-4">
+                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                            style="width: 56px; height: 56px; background: rgba(255,105,51,0.1); color: var(--primary); flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 32px;">school</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <h4 class="fw-bold m-0" style="font-size: 20px;">Students</h4>
+                            <p class="text-muted m-0" style="font-size: 14px; line-height: 1.6;">Access top-tier job
+                                opportunities, build professional profiles, and track applications with real-time status
+                                updates.</p>
+                            <ul class="list-unstyled mt-2 d-flex flex-column gap-2 m-0 p-0">
+                                <li class="d-flex align-items-center gap-2 text-muted" style="font-size: 13px;"><span
+                                        class="material-symbols-outlined text-primary"
+                                        style="font-size: 16px;">check_circle</span>AI Resume Builder</li>
+                                <li class="d-flex align-items-center gap-2 text-muted" style="font-size: 13px;"><span
+                                        class="material-symbols-outlined text-primary"
+                                        style="font-size: 16px;">check_circle</span>Mock Interview Portal</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 feature-card stitch-card"
+                    style="border: 1px solid rgba(0,78,137,0.05) !important;">
+                    <div class="d-flex align-items-start gap-4">
+                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                            style="width: 56px; height: 56px; background: rgba(0,78,137,0.1); color: var(--secondary); flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 32px;">work</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <h4 class="fw-bold m-0" style="font-size: 20px;">Companies</h4>
+                            <p class="text-muted m-0" style="font-size: 14px; line-height: 1.6;">Discover qualified
+                                talent, manage job postings, and automate high-volume shortlisting processes
+                                efficiently.</p>
+                            <ul class="list-unstyled mt-2 d-flex flex-column gap-2 m-0 p-0">
+                                <li class="d-flex align-items-center gap-2 text-muted" style="font-size: 13px;"><span
+                                        class="material-symbols-outlined text-secondary"
+                                        style="font-size: 16px;">verified</span>Vetted Candidate Access</li>
+                                <li class="d-flex align-items-center gap-2 text-muted" style="font-size: 13px;"><span
+                                        class="material-symbols-outlined text-secondary"
+                                        style="font-size: 16px;">verified</span>Bulk Offer Generation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-4 border-0 feature-card stitch-card"
+                    style="border: 1px solid rgba(247,179,43,0.05) !important;">
+                    <div class="d-flex align-items-start gap-4">
+                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                            style="width: 56px; height: 56px; background: rgba(247,179,43,0.1); color: var(--accent); flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 32px;">admin_panel_settings</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <h4 class="fw-bold m-0" style="font-size: 20px;">Admins</h4>
+                            <p class="text-muted m-0" style="font-size: 14px; line-height: 1.6;">Orchestrate complex
+                                placement drives, monitor analytics, and bridge the gap between students and recruiters.
+                            </p>
+                            <ul class="list-unstyled mt-2 d-flex flex-column gap-2 m-0 p-0">
+                                <li class="d-flex align-items-center gap-2 text-muted" style="font-size: 13px;"><span
+                                        class="material-symbols-outlined text-accent"
+                                        style="font-size: 16px;">analytics</span>Live Placement Dashboards</li>
+                                <li class="d-flex align-items-center gap-2 text-muted" style="font-size: 13px;"><span
+                                        class="material-symbols-outlined text-accent"
+                                        style="font-size: 16px;">analytics</span>Automated Scheduling</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Statistics Section -->
+<section class="py-5" style="background: rgba(0,78,137,0.02);">
+    <div class="container py-4 flex flex-column gap-5">
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <div class="bg-white p-4 rounded-4 text-center shadow-sm" style="border: 1px solid rgba(0,0,0,0.03);">
+                    <div class="display-6 fw-black text-primary" style="font-weight: 900;">500+</div>
+                    <div class="fw-bold text-muted text-uppercase" style="font-size: 12px; letter-spacing: -0.05em;">
+                        Hiring Partners</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="bg-white p-4 rounded-4 text-center shadow-sm" style="border: 1px solid rgba(0,0,0,0.03);">
+                    <div class="display-6 fw-black text-primary" style="font-weight: 900;">10k+</div>
+                    <div class="fw-bold text-muted text-uppercase" style="font-size: 12px; letter-spacing: -0.05em;">
+                        Offers Made</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="bg-white p-4 rounded-4 text-center shadow-sm" style="border: 1px solid rgba(0,0,0,0.03);">
+                    <div class="display-6 fw-black text-primary" style="font-weight: 900;">95%</div>
+                    <div class="fw-bold text-muted text-uppercase" style="font-size: 12px; letter-spacing: -0.05em;">
+                        Placement Rate</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="bg-white p-4 rounded-4 text-center shadow-sm" style="border: 1px solid rgba(0,0,0,0.03);">
+                    <div class="display-6 fw-black text-primary" style="font-weight: 900;">12 LPA</div>
+                    <div class="fw-bold text-muted text-uppercase" style="font-size: 12px; letter-spacing: -0.05em;">
+                        Average Package</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="container py-5 text-center mb-5 mt-4">
+    <div class="rounded-4 p-5 d-flex flex-column gap-4 align-items-center"
+        style="background: rgba(255,105,51,0.05); border: 1px solid rgba(255,105,51,0.1);">
+        <h2 class="display-5 fw-black m-0" style="color: #0f172a; font-weight: 900;">Ready to kickstart your career?
+        </h2>
+        <p class="text-muted m-0 fs-5" style="max-width: 600px;">Join thousands of students who have secured their dream
+            jobs through our portal.</p>
+        <button class="btn btn-primary px-5 py-3 rounded-3 fs-5 mt-2"
+            style="box-shadow: 0 10px 25px rgba(255,107,53,0.3);">
+            Get Started Now
+        </button>
+    </div>
+</section>
+
+<footer class="py-5" style="background-color: var(--dark); color: var(--white);">
+    <div class="container text-center">
+        <div class="mb-3">
+            <a href="#" class="text-white text-decoration-none mx-2">Privacy Policy</a>
+            <a href="#" class="text-white text-decoration-none mx-2">Terms of Service</a>
+            <a href="#" class="text-white text-decoration-none mx-2">Contact Us</a>
+        </div>
+        <p class="mb-0 text-muted">&copy; 2026 RecruitPlus. All rights reserved.</p>
+    </div>
+</footer>
+{% endblock %}

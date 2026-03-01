@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Admin</span>Panel
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('admin.manage_students') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_students' or request.endpoint == 'admin.view_student' or request.endpoint == 'admin.edit_student' %}active{% endif %}">
+            Manage Students
+        </a>
+        <a href="{{ url_for('admin.manage_companies') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_companies' or request.endpoint == 'admin.view_company' or request.endpoint == 'admin.edit_company' %}active{% endif %}">
+            Manage Companies
+        </a>
+        <a href="{{ url_for('admin.manage_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_drives' or request.endpoint == 'admin.view_drive' %}active{% endif %}">
+            Manage Drives
+        </a>
+        <a href="{{ url_for('admin.all_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.all_applications' or request.endpoint == 'admin.view_application' or request.endpoint == 'admin.edit_application' %}active{% endif %}">
+            All Applications
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('admin.all_applications') }}"
+                    class="btn btn-sm btn-light border d-flex align-items-center justify-content-center pt-2 pb-2"
+                    style="width: 40px; border-radius: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                </a>
+                <h4 class="mb-0 fw-bold" style="color: var(--secondary);">Application Details</h4>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">Admin</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="p-4 bg-light border-bottom d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center pb-1 text-primary"
+                        style="width: 50px; height: 50px;">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">description</span>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-secondary d-flex align-items-center gap-2">
+                            Application #{{ application.id }}
+                            {% if application.status == 'applied' %}
+                            <span
+                                class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-1"
+                                style="font-size: 12px; letter-spacing: 0.5px;">
+                                <i class="bi bi-send me-1"></i> APPLIED
+                            </span>
+                            {% elif application.status == 'shortlisted' %}
+                            <span
+                                class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-1"
+                                style="font-size: 12px; letter-spacing: 0.5px;">
+                                <i class="bi bi-star me-1"></i> SHORTLISTED
+                            </span>
+                            {% elif application.status == 'selected' %}
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1"
+                                style="font-size: 12px; letter-spacing: 0.5px;">
+                                <i class="bi bi-trophy me-1"></i> SELECTED
+                            </span>
+                            {% elif application.status == 'rejected' %}
+                            <span
+                                class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-1"
+                                style="font-size: 12px; letter-spacing: 0.5px;">
+                                <i class="bi bi-x-circle me-1"></i> REJECTED
+                            </span>
+                            {% else %}
+                            <span
+                                class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-1"
+                                style="font-size: 12px; letter-spacing: 0.5px;">
+                                {{ application.status|upper }}
+                            </span>
+                            {% endif %}
+                        </h5>
+                        <p class="mb-0 small text-muted d-flex align-items-center gap-1 mt-1">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+                            Applied: {{ application.application_date.strftime('%d %B %Y, %I:%M %p') }}
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin.edit_application', id=application.id) }}"
+                        class="btn btn-primary d-flex align-items-center gap-2 shadow-sm" style="border-radius: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span> Edit Status
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-4 p-md-5">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100 border rounded-4 shadow-none">
+                            <div
+                                class="card-header bg-transparent border-bottom py-3 px-4 d-flex align-items-center gap-2">
+                                <span class="material-symbols-outlined text-info">person</span>
+                                <h6 class="mb-0 fw-bold">Student Information</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                        style="letter-spacing: 0.5px;">Applicant Name</p>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <p class="mb-0 fw-bold" style="font-size: 16px;">{{
+                                            application.student_details.full_name }}</p>
+                                        <a href="{{ url_for('admin.view_student', id=application.student_details.id) }}"
+                                            class="text-primary d-flex align-items-center" title="View Student Profile">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 16px;">open_in_new</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                        style="letter-spacing: 0.5px;">Roll Number</p>
+                                    <p class="mb-0">{{ application.student_details.roll_no }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                        style="letter-spacing: 0.5px;">Email</p>
+                                    <p class="mb-0 text-muted">{{ application.student_details.user.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100 border rounded-4 shadow-none">
+                            <div
+                                class="card-header bg-transparent border-bottom py-3 px-4 d-flex align-items-center gap-2">
+                                <span class="material-symbols-outlined text-warning">work</span>
+                                <h6 class="mb-0 fw-bold">Drive Information</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                        style="letter-spacing: 0.5px;">Job Role</p>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <p class="mb-0 fw-bold" style="font-size: 16px;">{{
+                                            application.drive_details.job_title }}</p>
+                                        <a href="{{ url_for('admin.view_drive', id=application.drive_details.id) }}"
+                                            class="text-primary d-flex align-items-center" title="View Drive Details">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 16px;">open_in_new</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                        style="letter-spacing: 0.5px;">Company Name</p>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <p class="mb-0">{{ application.drive_details.company_details.company_name }}</p>
+                                        <a href="{{ url_for('admin.view_company', id=application.drive_details.company_id) }}"
+                                            class="text-primary d-flex align-items-center" title="View Company Profile">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 16px;">open_in_new</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                        style="letter-spacing: 0.5px;">CTC Offered</p>
+                                    <p class="mb-0 text-muted">{{ application.drive_details.ctc_range }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

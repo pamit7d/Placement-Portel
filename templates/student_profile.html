@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('student.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('student.browse_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'student.browse_drives' or request.endpoint == 'student.view_drive' %}active{% endif %}">
+            Browse Drives
+        </a>
+        <a href="{{ url_for('student.my_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'student.my_applications' or request.endpoint in ['student.application_status', 'student.application_detail', 'student.view_application'] %}active{% endif %}">
+            My Applications
+        </a>
+        <a href="{{ url_for('student.edit_profile') }}"
+            class="sidebar-link mt-5 {% if request.endpoint == 'student.edit_profile' %}active{% endif %}">
+            Profile
+        </a>
+    </div>
+
+    <div class="main-content flex-grow-1">
+    <!-- Topbar -->
+    <div class="dashboard-topbar d-flex justify-content-between align-items-center">
+        <div class="topbar-title-container">
+            <div class="topbar-avatar"
+                style="background: linear-gradient(135deg, var(--primary) 0%, #FF8E53 100%) !important;">
+                <span style="font-size: 1.2rem;">👨‍🎓</span>
+            </div>
+            <div>
+                <h4 class="topbar-title">Student Portal</h4>
+                <p class="topbar-subtitle">Welcome back</p>
+            </div>
+        </div>
+
+        <div class="topbar-user-section">
+            <span class="topbar-username">{{ current_user.username }}</span>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="container py-5">
+        <div class="card p-0 shadow-sm border-0 rounded-4 mx-auto" style="max-width: 900px; overflow: hidden;">
+            <!-- Header Area -->
+            <div class="bg-primary bg-opacity-10 px-4 py-4 px-md-5 py-md-5 position-relative border-bottom"
+                style="border-color: rgba(67, 97, 238, 0.1) !important;">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-primary fw-bold border overflow-hidden"
+                        style="width: 80px; height: 80px; font-size: 28px;">
+                        {% if student.profile_picture %}
+                        <img src="{{ url_for('static', filename=student.profile_picture) }}" alt="Profile"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                        <span class="material-symbols-outlined" style="font-size: 32px;">person</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-1 text-secondary" style="font-size: 1.8rem; letter-spacing: -0.5px;">
+                            Edit Profile</h3>
+                        <h6 class="mb-0 text-muted d-flex align-items-center gap-2">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">info</span> Manage your
+                            personal and academic details
+                        </h6>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('student.edit_profile') }}" enctype="multipart/form-data"
+                class="p-4 p-md-5 bg-white">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Personal Info -->
+                <div class="mb-5">
+                    <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                        <span class="material-symbols-outlined text-primary" style="font-size: 22px;">badge</span>
+                        Personal Information
+                    </h6>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase"
+                            style="letter-spacing: 0.5px;">Full Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i class="bi bi-person"></i>
+                            </span>
+                            <input type="text" class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                name="full_name" value="{{ student.full_name }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Roll Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-hash"></i>
+                                </span>
+                                <input type="text"
+                                    class="form-control input-field bg-light border-start-0 ps-0 text-muted fw-bold"
+                                    value="{{ student.roll_no }}" disabled readonly>
+                            </div>
+                            <small class="text-muted mt-2 d-block"><i class="bi bi-info-circle me-1"></i> Contact
+                                admin to change.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-telephone"></i>
+                                </span>
+                                <input type="tel" class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                    name="phone" value="{{ student.phone or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Academic Details -->
+                <div class="mb-5">
+                    <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                        <span class="material-symbols-outlined text-primary" style="font-size: 22px;">school</span>
+                        Academic Details
+                    </h6>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Branch</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control input-field bg-light text-muted fw-bold"
+                                    value="{{ student.branch }}" disabled readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Year</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control input-field bg-light text-muted fw-bold"
+                                    value="{{ student.year }}" disabled readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">CGPA</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control input-field bg-light text-muted fw-bold"
+                                    value="{{ student.cgpa }}" disabled readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label fw-bold small text-muted text-uppercase"
+                            style="letter-spacing: 0.5px;">Skills <span class="text-muted fw-normal text-none">(comma
+                                separated)</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i class="bi bi-braces"></i>
+                            </span>
+                            <input type="text" class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                name="skills" value="{{ student.skills or '' }}"
+                                placeholder="Python, Web Dev, React...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents & Photo -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                        <span class="material-symbols-outlined text-primary" style="font-size: 22px;">description</span>
+                        Documents & Photo
+                    </h6>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase"
+                            style="letter-spacing: 0.5px;">Profile Picture</label>
+                        <div class="d-flex align-items-start flex-column flex-sm-row gap-4 p-4 border rounded-3 bg-light position-relative"
+                            style="border-style: dashed !important; border-width: 2px !important;">
+                            <div class="flex-shrink-0">
+                                <div class="bg-white border rounded-circle d-flex align-items-center justify-content-center shadow-sm overflow-hidden"
+                                    style="width: 64px; height: 64px;">
+                                    {% if student.profile_picture %}
+                                    <img src="{{ url_for('static', filename=student.profile_picture) }}" alt="Profile"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                    <span class="material-symbols-outlined text-primary"
+                                        style="font-size: 32px;">account_circle</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 w-100">
+                                <input type="file" class="form-control bg-white mb-3 p-2" name="profile_picture"
+                                    accept="image/png, image/jpeg, image/jpg, image/gif">
+
+                                {% if student.profile_picture %}
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <small class="text-success fw-bold d-flex align-items-center gap-1"><i
+                                            class="bi bi-check2-all"></i> Photo uploaded: {{
+                                        student.profile_picture.split('/')[-1] }}</small>
+                                </div>
+                                {% else %}
+                                <small class="text-muted d-block d-flex align-items-center gap-1"><i
+                                        class="bi bi-info-circle"></i> No photo uploaded yet. (Max 2MB).</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label fw-bold small text-muted text-uppercase"
+                            style="letter-spacing: 0.5px;">Resume (PDF)</label>
+                        <div class="d-flex align-items-start flex-column flex-sm-row gap-4 p-4 border rounded-3 bg-light position-relative"
+                            style="border-style: dashed !important; border-width: 2px !important;">
+                            <div class="flex-shrink-0">
+                                <div class="bg-white border rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                    style="width: 64px; height: 64px;">
+                                    {% if student.resume_path %}
+                                    <span class="material-symbols-outlined text-success"
+                                        style="font-size: 32px;">check_circle</span>
+                                    {% else %}
+                                    <span class="material-symbols-outlined text-primary"
+                                        style="font-size: 32px;">upload_file</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 w-100">
+                                <input type="file" class="form-control bg-white mb-3 p-2" name="resume"
+                                    accept="application/pdf">
+
+                                {% if student.resume_path %}
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <a href="{{ url_for('static', filename=student.resume_path) }}" target="_blank"
+                                        class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2 bg-white"
+                                        style="border-radius: 8px;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size: 16px;">visibility</span>
+                                        View Current Resume
+                                    </a>
+                                    <small class="text-success fw-bold d-flex align-items-center gap-1"><i
+                                            class="bi bi-check2-all"></i> Uploaded: {{
+                                        student.resume_path.split('/')[-1] }}</small>
+                                </div>
+                                {% else %}
+                                <small class="text-muted d-block d-flex align-items-center gap-1"><i
+                                        class="bi bi-info-circle"></i> No resume uploaded yet. Please upload a PDF
+                                    file (Max 5MB).</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
+                    <a href="{{ url_for('student.dashboard') }}" class="btn btn-light border px-4 py-2"
+                        style="border-radius: 8px; font-weight: 500;">Cancel</a>
+                    <button type="submit" class="btn btn-primary shadow-sm px-4 py-2 d-flex align-items-center gap-2"
+                        style="border-radius: 8px; font-weight: 600;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</div>
+{% endblock %}

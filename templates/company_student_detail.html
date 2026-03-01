@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('company.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'company.dashboard' %}active-company{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('company.create_drive') }}"
+            class="sidebar-link {% if request.endpoint == 'company.create_drive' or request.endpoint == 'company.edit_drive' %}active-company{% endif %}">
+            Create Drive
+        </a>
+        <a href="{{ url_for('company.profile') }}"
+            class="sidebar-link mt-5 {% if request.endpoint == 'company.profile' %}active-company{% endif %}">
+            Profile
+        </a>
+    </div>
+        <a href="{{ url_for('company.dashboard') }}" class="sidebar-link">
+            Dashboard
+        </a>
+        <a href="{{ url_for('company.create_drive') }}" class="sidebar-link">
+            Create Drive
+        </a>
+        <a href="{{ url_for('company.profile') }}" class="sidebar-link mt-5">
+            Profile
+        </a>
+    </div>
+
+    <div class="main-content flex-grow-1" style="background-color: var(--light-bg); min-height: 100vh;">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('company.view_applicants', id=application.drive_id) }}"
+                    class="btn btn-sm btn-light border d-flex align-items-center justify-content-center pt-2 pb-2"
+                    style="width: 40px; border-radius: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                </a>
+                <h4 class="mb-0 fw-bold" style="color: var(--secondary);">Applicant Profile</h4>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="row w-100 m-0">
+            <!-- Left Profile Card -->
+            <div class="col-xl-4 col-lg-5 p-0 pe-lg-4 mb-4 mb-lg-0">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <div class="bg-primary bg-opacity-10 py-5 text-center position-relative border-bottom"
+                        style="border-color: rgba(67, 97, 238, 0.1) !important;">
+                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-primary fw-bold mx-auto mb-3 border border-white border-4"
+                            style="width: 110px; height: 110px; font-size: 36px;">
+                            {{ student.full_name[:1] | upper }}
+                        </div>
+                        <h4 class="fw-bold mb-1 text-secondary" style="font-size: 1.5rem;">{{ student.full_name }}</h4>
+                        <p class="text-muted small mb-0">{{ student.user.email }}</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        <div class="d-flex flex-column gap-3">
+                            <div
+                                class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-primary shadow-sm"
+                                        style="width: 36px; height: 36px;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">badge</span>
+                                    </div>
+                                    <span class="text-muted small fw-bold text-uppercase"
+                                        style="letter-spacing: 0.5px;">Roll Number</span>
+                                </div>
+                                <span class="fw-bold text-dark">{{ student.roll_no }}</span>
+                            </div>
+
+                            <div
+                                class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-success shadow-sm"
+                                        style="width: 36px; height: 36px;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">call</span>
+                                    </div>
+                                    <span class="text-muted small fw-bold text-uppercase"
+                                        style="letter-spacing: 0.5px;">Phone</span>
+                                </div>
+                                <span class="fw-bold text-dark">{{ student.phone or 'Not provided' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Details Area -->
+            <div class="col-xl-8 col-lg-7 p-0">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-3 border-bottom">
+                            <span class="material-symbols-outlined text-primary" style="font-size: 22px;">school</span>
+                            Academic Information
+                        </h6>
+
+                        <div class="row g-4 mb-5">
+                            <div class="col-sm-6">
+                                <div class="p-4 bg-light rounded-3 border h-100">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-primary"
+                                            style="width: 44px; height: 44px;">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 22px;">account_tree</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted small fw-bold mb-0 text-uppercase"
+                                                style="letter-spacing: 0.5px;">Branch</p>
+                                            <p class="mb-0 fw-bold fs-5 text-dark">{{ student.branch or 'Not specified'
+                                                }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="p-4 bg-light rounded-3 border h-100">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-warning"
+                                            style="width: 44px; height: 44px;">
+                                            <span class="material-symbols-outlined" style="font-size: 22px;">star</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted small fw-bold mb-0 text-uppercase"
+                                                style="letter-spacing: 0.5px;">CGPA</p>
+                                            <p class="mb-0 fw-bold fs-5 text-dark">{{ student.cgpa or 'N/A' }} <span
+                                                    class="text-muted fs-6 fw-normal">/ 10</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="p-4 bg-light rounded-3 border h-100">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-info"
+                                            style="width: 44px; height: 44px;">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 22px;">calendar_month</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted small fw-bold mb-0 text-uppercase"
+                                                style="letter-spacing: 0.5px;">Year</p>
+                                            <p class="mb-0 fw-bold fs-5 text-dark">{{ student.year or 'Not specified' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-3 border-bottom">
+                            <span class="material-symbols-outlined text-info" style="font-size: 22px;">psychology</span>
+                            Skills & Capabilities
+                        </h6>
+
+                        <div class="mb-5">
+                            {% if student.skills %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for skill in student.skills.split(',') %}
+                                <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill"
+                                    style="font-size: 13px; font-weight: 500;">
+                                    {{ skill.strip() }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="p-4 bg-light rounded-3 border text-center text-muted">
+                                <span class="material-symbols-outlined mb-2"
+                                    style="font-size: 28px; color: #cbd5e1;">code_off</span>
+                                <p class="mb-0 small">No technical skills listed yet.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-3 border-bottom">
+                            <span class="material-symbols-outlined text-danger"
+                                style="font-size: 22px;">description</span> Documents
+                        </h6>
+
+                        <div>
+                            <div
+                                class="bg-light p-4 rounded-3 border d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center border shadow-sm"
+                                        style="width: 48px; height: 48px;">
+                                        <span
+                                            class="material-symbols-outlined {% if student.resume_path %}text-danger{% else %}text-muted{% endif %}"
+                                            style="font-size: 24px;">{% if student.resume_path %}picture_as_pdf{% else
+                                            %}find_in_page{% endif %}</span>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 fw-bold text-dark">Student Resume</h6>
+                                        <p class="mb-0 text-muted small">{% if student.resume_path %}PDF Document
+                                            available{% else %}Not uploaded yet{% endif %}</p>
+                                    </div>
+                                </div>
+
+                                {% if student.resume_path %}
+                                <a href="{{ url_for('static', filename=student.resume_path) }}" target="_blank"
+                                    class="btn btn-white shadow-sm border d-flex align-items-center gap-2 rounded-pill px-4 py-2"
+                                    style="font-weight: 600;">
+                                    <span class="material-symbols-outlined text-primary"
+                                        style="font-size: 18px;">visibility</span> View Resume
+                                </a>
+                                {% else %}
+                                <span class="badge bg-secondary px-3 py-2 rounded-pill">Missing Document</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

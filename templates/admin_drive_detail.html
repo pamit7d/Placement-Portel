@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Admin</span>Panel
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('admin.manage_students') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_students' or request.endpoint == 'admin.view_student' or request.endpoint == 'admin.edit_student' %}active{% endif %}">
+            Manage Students
+        </a>
+        <a href="{{ url_for('admin.manage_companies') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_companies' or request.endpoint == 'admin.view_company' or request.endpoint == 'admin.edit_company' %}active{% endif %}">
+            Manage Companies
+        </a>
+        <a href="{{ url_for('admin.manage_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_drives' or request.endpoint == 'admin.view_drive' %}active{% endif %}">
+            Manage Drives
+        </a>
+        <a href="{{ url_for('admin.all_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.all_applications' or request.endpoint == 'admin.view_application' or request.endpoint == 'admin.edit_application' %}active{% endif %}">
+            All Applications
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('admin.manage_drives') }}"
+                    class="btn btn-sm btn-light border d-flex align-items-center justify-content-center pt-2 pb-2"
+                    style="width: 40px; border-radius: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                </a>
+                <h4 class="mb-0 fw-bold" style="color: var(--secondary);">Placement Drive Details</h4>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">Admin</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="row w-100 m-0">
+            <div class="col-xl-8 col-lg-7 p-0 pe-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                    <!-- Header Banner -->
+                    <div class="bg-primary bg-opacity-10 px-4 py-5 position-relative border-bottom"
+                        style="border-color: rgba(67, 97, 238, 0.1) !important;">
+                        <h3 class="fw-bold mb-2 text-secondary" style="font-size: 1.8rem; letter-spacing: -0.5px;">{{
+                            drive.job_title }}</h3>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="material-symbols-outlined text-primary"
+                                style="font-size: 20px;">business</span>
+                            <h5 class="mb-0 fw-bold" style="color: var(--primary);">{{
+                                drive.company_details.company_name }}</h5>
+                        </div>
+                        <span
+                            class="badge badge-{{ drive.status }} position-absolute top-0 end-0 m-4 px-3 py-2 rounded-pill shadow-sm"
+                            style="font-size: 12px; letter-spacing: 0.5px;">
+                            {{ drive.status | upper }}
+                        </span>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <div class="p-4 bg-light rounded-3 border h-100">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-success"
+                                            style="width: 40px; height: 40px;">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 20px;">payments</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted small fw-bold mb-0 text-uppercase"
+                                                style="letter-spacing: 0.5px;">CTC Range</p>
+                                            <p class="mb-0 fw-bold fs-6 text-dark">{{ drive.ctc_range }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-info"
+                                            style="width: 40px; height: 40px;">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 20px;">location_on</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted small fw-bold mb-0 text-uppercase"
+                                                style="letter-spacing: 0.5px;">Location</p>
+                                            <p class="mb-0 fw-bold fs-6 text-dark">{{ drive.location }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="p-4 bg-light rounded-3 border h-100">
+                                    <h6 class="fw-bold text-secondary mb-3 d-flex align-items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary"
+                                            style="font-size: 20px;">school</span> Eligibility
+                                    </h6>
+                                    <p class="mb-0" style="color: #475569; line-height: 1.6;">{{ drive.eligibility }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <h6 class="fw-bold text-secondary mb-3 d-flex align-items-center gap-2 pb-2 border-bottom">
+                                <span class="material-symbols-outlined text-warning"
+                                    style="font-size: 20px;">description</span> Job Description
+                            </h6>
+                            <div class="preview-content p-4 bg-light rounded-3 border font-monospace text-dark"
+                                style="white-space: pre-wrap; font-size: 14px; line-height: 1.7; width: 100%;">{{
+                                drive.description }}</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 pt-4 border-top">
+                            {% if drive.status == 'pending' %}
+                            <form method="POST"
+                                action="{{ url_for('admin.update_drive', id=drive.id, action='reject') }}" class="m-0">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-outline-danger fw-bold px-4"
+                                    style="border-radius: 8px;">Reject Drive</button>
+                            </form>
+                            <form method="POST"
+                                action="{{ url_for('admin.update_drive', id=drive.id, action='approve') }}" class="m-0">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit"
+                                    class="btn btn-success d-flex align-items-center gap-2 shadow-sm px-4"
+                                    style="border-radius: 8px; font-weight: 600;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span>
+                                    Approve Drive
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <a href="{{ url_for('admin.all_applications', drive=drive.id) }}"
+                                class="btn btn-primary d-flex align-items-center gap-2 shadow-sm px-4"
+                                style="border-radius: 8px; font-weight: 600;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">groups</span> View
+                                Applications
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Info Sidebar -->
+            <div class="col-xl-4 col-lg-5 p-0">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden sticky-top"
+                    style="top: 20px; z-index: 10;">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 border-bottom pb-3">
+                            <span class="material-symbols-outlined text-danger" style="font-size: 20px;">event</span>
+                            Important Dates
+                        </h6>
+
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            <div
+                                class="p-3 bg-light rounded-3 border border-danger border-opacity-25 d-flex align-items-center gap-3">
+                                <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-danger shadow-sm border border-danger border-opacity-25"
+                                    style="width: 48px; height: 48px;">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size: 24px;">calendar_clock</span>
+                                </div>
+                                <div>
+                                    <p class="text-muted small fw-bold mb-0 text-uppercase"
+                                        style="letter-spacing: 0.5px;">Deadline</p>
+                                    <p class="mb-0 fw-bold fs-6 text-danger">{{ drive.deadline.strftime('%d %B %Y') if
+                                        drive.deadline else 'Not provided' }}</p>
+                                    {% if drive.deadline and current_date > drive.deadline %}
+                                    <span class="badge bg-danger rounded-pill mt-1"
+                                        style="font-size: 10px;">EXPIRED</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 border-bottom pb-3">
+                            <span class="material-symbols-outlined text-info" style="font-size: 20px;">analytics</span>
+                            Insights
+                        </h6>
+
+                        <div
+                            class="bg-light p-3 rounded-3 border d-flex justify-content-between align-items-center mb-0">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="material-symbols-outlined text-primary"
+                                    style="font-size: 20px;">group_add</span>
+                                <span class="fw-bold text-muted">Total Applicants</span>
+                            </div>
+                            <span class="badge bg-primary rounded-pill px-3 py-2 fs-6 shadow-sm">{{
+                                drive.applications.count() }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

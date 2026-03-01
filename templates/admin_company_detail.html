@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Admin</span>Panel
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('admin.manage_students') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_students' or request.endpoint == 'admin.view_student' or request.endpoint == 'admin.edit_student' %}active{% endif %}">
+            Manage Students
+        </a>
+        <a href="{{ url_for('admin.manage_companies') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_companies' or request.endpoint == 'admin.view_company' or request.endpoint == 'admin.edit_company' %}active{% endif %}">
+            Manage Companies
+        </a>
+        <a href="{{ url_for('admin.manage_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_drives' or request.endpoint == 'admin.view_drive' %}active{% endif %}">
+            Manage Drives
+        </a>
+        <a href="{{ url_for('admin.all_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.all_applications' or request.endpoint == 'admin.view_application' or request.endpoint == 'admin.edit_application' %}active{% endif %}">
+            All Applications
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('admin.manage_companies') }}"
+                    class="btn btn-sm btn-light border d-flex align-items-center justify-content-center pt-2 pb-2"
+                    style="width: 40px; border-radius: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                </a>
+                <h4 class="mb-0 fw-bold" style="color: var(--secondary);">Company Details</h4>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">Admin</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="row w-100 m-0">
+            <div class="col-lg-8 p-0">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                    <!-- Header Section -->
+                    <div class="card-body p-4 p-md-5 border-bottom position-relative"
+                        style="background: linear-gradient(to right, #f8fafc, #ffffff);">
+                        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-4">
+                            <div class="d-flex align-items-center gap-4">
+                                {% if company.logo_path %}
+                                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center p-2 border"
+                                    style="width: 90px; height: 90px;">
+                                    <img src="{{ url_for('static', filename=company.logo_path) }}" alt="Company Logo"
+                                        class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                                </div>
+                                {% else %}
+                                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center border"
+                                    style="width: 90px; height: 90px; background: linear-gradient(135deg, var(--secondary) 0%, #334155 100%);">
+                                    <span class="text-white fw-bold fs-2">{{ company.company_name[:1] | upper }}</span>
+                                </div>
+                                {% endif %}
+
+                                <div>
+                                    <h3 class="fw-bold mb-1" style="color: var(--secondary); letter-spacing: -0.5px;">{{
+                                        company.company_name }}</h3>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <p class="text-muted mb-0 d-flex align-items-center gap-1">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 16px;">badge</span>
+                                            {{ company.hr_name }} (HR)
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column align-items-sm-end gap-2">
+                                {% if company.approval_status == 'approved' %}
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 shadow-sm"
+                                    style="font-size: 13px; letter-spacing: 0.5px;">
+                                    <i class="bi bi-check-circle me-1"></i> Status: APPROVED
+                                </span>
+                                {% elif company.approval_status == 'pending' %}
+                                <span
+                                    class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2 shadow-sm"
+                                    style="font-size: 13px; letter-spacing: 0.5px;">
+                                    <i class="bi bi-clock-history me-1"></i> Status: PENDING
+                                </span>
+                                {% else %}
+                                <span
+                                    class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2 shadow-sm"
+                                    style="font-size: 13px; letter-spacing: 0.5px;">
+                                    <i class="bi bi-x-circle me-1"></i> Status: REJECTED
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Details Section -->
+                    <div class="card-body p-4 p-md-5">
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3 text-secondary d-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary"
+                                        style="font-size: 20px;">contact_mail</span> Contact Information
+                                </h6>
+                                <div class="bg-light p-4 rounded-3 border">
+                                    <div class="mb-3">
+                                        <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                            style="letter-spacing: 0.5px;">HR Contact Name</p>
+                                        <p class="mb-0 fw-bold" style="color: var(--secondary);">{{ company.hr_name }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                            style="letter-spacing: 0.5px;">HR Email</p>
+                                        <p class="mb-0 text-dark d-flex align-items-center gap-2">
+                                            <span class="material-symbols-outlined text-muted"
+                                                style="font-size: 16px;">mail</span>
+                                            <a href="mailto:{{ company.user.email }}" class="text-decoration-none">{{
+                                                company.user.email }}</a>
+                                        </p>
+                                    </div>
+                                    <div class="mt-3">
+                                        <p class="text-muted small fw-bold mb-1 text-uppercase"
+                                            style="letter-spacing: 0.5px;">Website</p>
+                                        <p class="mb-0 text-dark d-flex align-items-center gap-2">
+                                            <span class="material-symbols-outlined text-muted"
+                                                style="font-size: 16px;">language</span>
+                                            {% if company.website %}
+                                            <a href="{{ company.website }}" target="_blank"
+                                                class="text-decoration-none">{{ company.website }}</a>
+                                            {% else %}
+                                            <span class="text-muted fst-italic">Not provided</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3 text-secondary d-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined text-info"
+                                        style="font-size: 20px;">info</span> About Company
+                                </h6>
+                                <div class="bg-light p-4 rounded-3 border h-100">
+                                    <p class="mb-0" style="color: #475569; line-height: 1.6; white-space: pre-wrap;">{{
+                                        company.description or 'No description provided by the company.' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 justify-content-end pt-4 border-top">
+                            <a href="{{ url_for('admin.manage_companies') }}" class="btn btn-light fw-bold px-4"
+                                style="border-radius: 8px;">Back to List</a>
+                            <a href="{{ url_for('admin.edit_company', id=company.id) }}"
+                                class="btn btn-primary d-flex align-items-center gap-2 shadow-sm px-4"
+                                style="border-radius: 8px; font-weight: 600;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span> Edit
+                                Company
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats Sidebar (Optional) -->
+            <div class="col-lg-4 d-none d-lg-block">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 border-bottom pb-3">
+                            <span class="material-symbols-outlined text-success"
+                                style="font-size: 20px;">monitoring</span> Activity Overview
+                        </h6>
+
+                        <div class="d-flex flex-column gap-3">
+                            <div
+                                class="p-3 bg-light rounded-3 border d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-primary shadow-sm"
+                                        style="width: 40px; height: 40px;">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">work</span>
+                                    </div>
+                                    <span class="fw-bold text-muted">Total Drives</span>
+                                </div>
+                                <span class="fw-bold fs-5 text-secondary">
+                                    {{ company.drives|length }}
+                                </span>
+                            </div>
+
+                            <div
+                                class="p-3 bg-light rounded-3 border d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center text-success shadow-sm"
+                                        style="width: 40px; height: 40px;">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">group</span>
+                                    </div>
+                                    <span class="fw-bold text-muted">Account ID</span>
+                                </div>
+                                <span class="fw-bold text-secondary">
+                                    #{{ company.user_id }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

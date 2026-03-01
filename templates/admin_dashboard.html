@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('admin.manage_companies') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_companies' or request.endpoint == 'admin.view_company' or request.endpoint == 'admin.edit_company' %}active{% endif %}">
+            Manage Companies
+        </a>
+        <a href="{{ url_for('admin.manage_students') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_students' or request.endpoint == 'admin.view_student' or request.endpoint == 'admin.edit_student' %}active{% endif %}">
+            Manage Students
+        </a>
+        <a href="{{ url_for('admin.manage_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_drives' or request.endpoint == 'admin.view_drive' %}active{% endif %}">
+            Manage Drives
+        </a>
+        <a href="{{ url_for('admin.all_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.all_applications' or request.endpoint == 'admin.view_application' or request.endpoint == 'admin.edit_application' %}active{% endif %}">
+            All Applications
+        </a>
+        <a href="#" onclick="alert('Settings page is not implemented.')" class="sidebar-link mt-5">
+            Settings
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center">
+            <div class="topbar-title-container">
+                <div class="topbar-avatar"
+                    style="background: linear-gradient(135deg, var(--dark) 0%, #4a4e69 100%) !important;">
+                    <span style="font-size: 1.2rem;">⚙️</span>
+                </div>
+                <div>
+                    <h4 class="topbar-title">Admin Dashboard</h4>
+                    <p class="topbar-subtitle">System Management</p>
+                </div>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert"
+                style="border-radius: 12px;">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="mb-5 d-flex flex-column gap-1">
+            <h2 class="m-0 fw-bold" style="color: #0f172a;">Overview</h2>
+            <p class="text-muted m-0" style="font-size: 14px;">Manage your campus activities for the current season.</p>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card h-100 stat-card"
+                    style="background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="material-symbols-outlined rounded-3 text-white"
+                            style="background: rgba(255,255,255,0.2); padding: 8px;">school</span>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-1" style="color: white; font-weight: 800;">{{ students }}</h2>
+                    <p class="mb-0"
+                        style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase;">
+                        Total Students</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 stat-card"
+                    style="background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="material-symbols-outlined rounded-3 text-white"
+                            style="background: rgba(255,255,255,0.2); padding: 8px;">business</span>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-1" style="color: white; font-weight: 800;">{{ companies }}</h2>
+                    <p class="mb-0"
+                        style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase;">
+                        Partner Companies</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 stat-card"
+                    style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="material-symbols-outlined rounded-3 text-white"
+                            style="background: rgba(255,255,255,0.2); padding: 8px;">event_available</span>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-1" style="color: white; font-weight: 800;">{{ drives }}</h2>
+                    <p class="mb-0"
+                        style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase;">
+                        Active Drives</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 stat-card"
+                    style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="material-symbols-outlined rounded-3 text-white"
+                            style="background: rgba(255,255,255,0.2); padding: 8px;">assignment_ind</span>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-1" style="color: white; font-weight: 800;">{{ applications }}</h2>
+                    <p class="mb-0"
+                        style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase;">
+                        Total Applications</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Table -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 custom-table-card">
+            <div class="bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold d-flex align-items-center gap-2" style="color: #0f172a;">
+                    <span class="material-symbols-outlined text-primary" style="font-size: 20px;">history</span> Recent
+                    Applications
+                </h6>
+                <a href="{{ url_for('admin.all_applications') }}" class="btn btn-sm btn-outline-primary"
+                    style="border-radius: 6px; font-weight: 500;">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table custom-table align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 text-uppercase text-muted"
+                                style="font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">Student</th>
+                            <th class="text-uppercase text-muted"
+                                style="font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">Applied For</th>
+                            <th class="text-uppercase text-muted"
+                                style="font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">Status</th>
+                            <th class="text-end pe-4 text-uppercase text-muted"
+                                style="font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">Date Applied</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app, student, drive, company in recent_applications %}
+                        <tr class="table-row-hover" style="transition: all 0.2s;">
+                            <td class="ps-4 py-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary fw-bold border"
+                                        style="width: 40px; height: 40px; font-size: 14px;">
+                                        {{ student.full_name[:1] | upper }}
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 fw-bold" style="color: var(--secondary); font-size: 14px;">{{
+                                            student.full_name }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                <p class="mb-0 fw-bold" style="color: #0f172a; font-size: 14px;">{{ drive.job_title }}
+                                </p>
+                                <p class="mb-0 small text-muted d-flex align-items-center gap-1">
+                                    <span class="material-symbols-outlined" style="font-size: 12px;">business</span> {{
+                                    company.company_name }}
+                                </p>
+                            </td>
+                            <td class="py-3">
+                                <span class="badge badge-{{ app.status }} px-3 py-1 rounded-pill"
+                                    style="font-size: 11px; letter-spacing: 0.5px;">
+                                    {{ app.status | upper }}
+                                </span>
+                            </td>
+                            <td class="text-end pe-4 py-3 text-muted" style="font-size: 14px;">
+                                {{ app.application_date.strftime('%d %b %Y') }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3 text-muted border"
+                                    style="width: 60px; height: 60px;">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size: 28px; color: #cbd5e1;">inbox_customize</span>
+                                </div>
+                                <p class="mb-0">No recent applications found.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('company.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'company.dashboard' %}active-company{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('company.create_drive') }}"
+            class="sidebar-link {% if request.endpoint == 'company.create_drive' or request.endpoint == 'company.edit_drive' %}active-company{% endif %}">
+            Create Drive
+        </a>
+        <a href="{{ url_for('company.profile') }}"
+            class="sidebar-link mt-5 {% if request.endpoint == 'company.profile' %}active-company{% endif %}">
+            Profile
+        </a>
+    </div>
+
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center">
+            <div class="topbar-title-container">
+                {% if company and company.logo_path %}
+                <img src="{{ url_for('static', filename=company.logo_path) }}" alt="Logo" class="topbar-logo-img">
+                {% elif company %}
+                <div class="topbar-avatar">
+                    {{ company.company_name[:1] }}
+                </div>
+                {% else %}
+                <div class="topbar-avatar"
+                    style="background: linear-gradient(135deg, var(--secondary) 0%, #007BB5 100%) !important;">
+                    <i class="bi bi-building"></i>
+                </div>
+                {% endif %}
+                <div>
+                    <h4 class="topbar-title">{% if company %}{{ company.company_name }}{% else %}Company Portal{% endif
+                        %}</h4>
+                    <p class="topbar-subtitle">Company Dashboard</p>
+                </div>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Kanban Board Horizontal Scroll Container -->
+
+
+
+        <div class="container-fluid py-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="p-4 bg-light border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-secondary d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">groups</span>
+                        Applications for {{ drive.job_title }}
+                    </h5>
+
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('company.view_applicants', id=drive.id, status='All') }}"
+                            class="btn btn-sm {% if current_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+                        <a href="{{ url_for('company.view_applicants', id=drive.id, status='Applied') }}"
+                            class="btn btn-sm {% if current_status == 'Applied' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Applied</a>
+                        <a href="{{ url_for('company.view_applicants', id=drive.id, status='Shortlisted') }}"
+                            class="btn btn-sm {% if current_status == 'Shortlisted' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Shortlisted</a>
+                        <a href="{{ url_for('company.view_applicants', id=drive.id, status='Selected') }}"
+                            class="btn btn-sm {% if current_status == 'Selected' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Selected</a>
+                        <a href="{{ url_for('company.view_applicants', id=drive.id, status='Rejected') }}"
+                            class="btn btn-sm {% if current_status == 'Rejected' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Rejected</a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Student</th>
+                                <th>Branch</th>
+                                <th>CGPA</th>
+                                <th>Status</th>
+                                <th class="pe-4 text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                                            style="width: 40px; height: 40px;">
+                                            {{ app.student_details.full_name[:1].upper() }}
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">{{ app.student_details.full_name
+                                                }}</span>
+                                            <span class="text-muted small">Roll: {{ app.student_details.roll_no
+                                                }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ app.student_details.branch }}</td>
+                                <td>{{ app.student_details.cgpa }} / 10</td>
+                                <td>
+                                    <form method="POST"
+                                        action="{{ url_for('company.update_application_status', id=app.id) }}"
+                                        class="d-flex align-items-center gap-2 m-0">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <select name="status"
+                                            class="form-select form-select-sm bg-light-focus border-0 shadow-sm"
+                                            style="border-radius: 8px; font-weight: 500;">
+                                            <option value="applied" {% if app.status=='applied' %}selected{% endif %}>
+                                                Applied</option>
+                                            <option value="shortlisted" {% if app.status=='shortlisted' %}selected{%
+                                                endif %}>Shortlisted</option>
+                                            <option value="selected" {% if app.status=='selected' %}selected{% endif %}>
+                                                Selected</option>
+                                            <option value="rejected" {% if app.status=='rejected' %}selected{% endif %}>
+                                                Rejected</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-primary"
+                                            style="border-radius: 8px;">Update</button>
+                                    </form>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <a href="{{ url_for('company.view_applicant_profile', id=app.id) }}"
+                                        class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                                        style="border-radius: 8px;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size: 16px;">visibility</span> View Profile
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="d-flex flex-column align-items-center text-muted">
+                                        <span class="material-symbols-outlined mb-2"
+                                            style="font-size: 48px; opacity: 0.5;">inbox</span>
+                                        <p class="mb-0">No applications found for this criteria.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+
+
+{% endblock %}

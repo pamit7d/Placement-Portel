@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center py-5">
+    <div class="card" style="width: 100%; max-width: 600px; padding: 40px; border-radius: var(--radius-lg);">
+        <h2 class="text-center mb-4 text-primary">Create Student Account</h2>
+
+        <form method="POST" action="{{ url_for('auth.register_student') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-4">
+                <label class="form-label text-muted small fw-bold">Full Name <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="bi bi-person"></i>
+                    </span>
+                    <input type="text" class="form-control input-field border-start-0 ps-0" name="full_name"
+                        placeholder="John Doe" required>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="form-label text-muted small fw-bold">Roll Number <span
+                            class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-hash"></i>
+                        </span>
+                        <input type="text" class="form-control input-field border-start-0 ps-0" name="roll_no"
+                            placeholder="e.g. 2024CS001" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold">Email <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input type="email" class="form-control input-field border-start-0 ps-0" name="email"
+                            placeholder="john@example.com" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="form-label text-muted small fw-bold">Password <span
+                            class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input type="password" class="form-control input-field border-start-0 ps-0" name="password"
+                            placeholder="Create a password" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold">Phone Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-telephone"></i>
+                        </span>
+                        <input type="tel" class="form-control input-field border-start-0 ps-0" name="phone"
+                            placeholder="Your phone number">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4 border-light">
+
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <label class="form-label text-muted small fw-bold">Branch</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-book"></i>
+                        </span>
+                        <input type="text" class="form-control input-field border-start-0 ps-0" name="branch"
+                            placeholder="e.g. CSE">
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <label class="form-label text-muted small fw-bold">Year of Study</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-calendar"></i>
+                        </span>
+                        <input type="text" class="form-control input-field border-start-0 ps-0" name="year"
+                            placeholder="e.g. 2026">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted small fw-bold">CGPA</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-warning">
+                            <i class="bi bi-star-fill"></i>
+                        </span>
+                        <input type="number" step="0.01" min="0" max="10"
+                            class="form-control input-field border-start-0 ps-0" name="cgpa" placeholder="0.00">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-muted small fw-bold">Skills</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="bi bi-braces"></i>
+                    </span>
+                    <input type="text" class="form-control input-field border-start-0 ps-0" name="skills"
+                        placeholder="e.g. Python, Web Dev, React...">
+                </div>
+                <div class="form-text text-muted small mt-1">Separate skills with commas</div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-muted small fw-bold">Upload Resume</label>
+                <div class="d-flex align-items-center gap-3 bg-light p-3 rounded-3 border border-dashed">
+                    <div class="bg-white rounded-circle d-flex mx-2 align-items-center justify-content-center shadow-sm"
+                        style="width: 40px; height: 40px;">
+                        <span class="material-symbols-outlined text-danger" style="font-size: 20px;">upload_file</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <input type="file" class="form-control border-0 bg-transparent shadow-none" name="resume"
+                            accept="application/pdf" style="padding: 0;">
+                        <div class="form-text text-muted small m-0 mt-1">Accepted format: PDF only. Max size: 5MB</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid mt-5">
+                <button type="submit" class="btn-primary py-3">Register</button>
+            </div>
+
+            <div class="text-center mt-4">
+                <span class="text-muted">Already registered?</span>
+                <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold ms-1"
+                    style="color: var(--secondary);">Login</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

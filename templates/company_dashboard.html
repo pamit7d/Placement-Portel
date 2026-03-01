@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('company.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'company.dashboard' %}active-company{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('company.create_drive') }}"
+            class="sidebar-link {% if request.endpoint == 'company.create_drive' or request.endpoint == 'company.edit_drive' %}active-company{% endif %}">
+            Create Drive
+        </a>
+        <a href="{{ url_for('company.profile') }}"
+            class="sidebar-link mt-5 {% if request.endpoint == 'company.profile' %}active-company{% endif %}">
+            Profile
+        </a>
+    </div>
+
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center">
+            <div class="topbar-title-container">
+                {% if company and company.logo_path %}
+                <img src="{{ url_for('static', filename=company.logo_path) }}" alt="Logo" class="topbar-logo-img">
+                {% elif company %}
+                <div class="topbar-avatar">
+                    {{ company.company_name[:1] }}
+                </div>
+                {% else %}
+                <div class="topbar-avatar">
+                    <i class="bi bi-grid-fill"></i>
+                </div>
+                {% endif %}
+                <div>
+                    <h4 class="topbar-title">{% if company %}{{ company.company_name }}{% else %}Dashboard{% endif %}
+                    </h4>
+                    <p class="topbar-subtitle">Company Portal</p>
+                </div>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% if company.approval_status != 'approved' %}
+        <div class="alert alert-warning">
+            Your company profile is currently <strong>{{ company.approval_status }}</strong>. You must be approved by an
+            administrator before you can create placement drives.
+        </div>
+        {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="container-fluid py-4">
+            <!-- Stats Row -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 position-relative overflow-hidden h-100"
+                        style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
+                        <div class="position-absolute end-0 top-0 p-3 opacity-10">
+                            <span class="material-symbols-outlined"
+                                style="font-size: 80px; color: var(--primary);">campaign</span>
+                        </div>
+                        <div class="d-flex flex-column position-relative z-1 h-100">
+                            <div class="mb-3">
+                                <span
+                                    class="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm"
+                                    style="width: 48px; height: 48px;">
+                                    <span class="material-symbols-outlined">campaign</span>
+                                </span>
+                            </div>
+                            <h2 class="display-5 fw-bold mb-1 text-dark">{{ drives }}</h2>
+                            <p class="mb-0 text-muted fw-bold text-uppercase mt-auto shadow-sm-text"
+                                style="letter-spacing: 0.5px; font-size: 13px;">Drives Created</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 position-relative overflow-hidden h-100"
+                        style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #10b981 !important;">
+                        <div class="position-absolute end-0 top-0 p-3 opacity-10">
+                            <span class="material-symbols-outlined"
+                                style="font-size: 80px; color: #10b981;">description</span>
+                        </div>
+                        <div class="d-flex flex-column position-relative z-1 h-100">
+                            <div class="mb-3">
+                                <span
+                                    class="bg-white text-success rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm"
+                                    style="width: 48px; height: 48px;">
+                                    <span class="material-symbols-outlined">description</span>
+                                </span>
+                            </div>
+                            <h2 class="display-5 fw-bold mb-1 text-dark">{{ applications }}</h2>
+                            <p class="mb-0 text-muted fw-bold text-uppercase mt-auto shadow-sm-text"
+                                style="letter-spacing: 0.5px; font-size: 13px;">Applications Received</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 position-relative overflow-hidden h-100"
+                        style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #f59e0b !important;">
+                        <div class="position-absolute end-0 top-0 p-3 opacity-10">
+                            <span class="material-symbols-outlined" style="font-size: 80px; color: #f59e0b;">star</span>
+                        </div>
+                        <div class="d-flex flex-column position-relative z-1 h-100">
+                            <div class="mb-3">
+                                <span
+                                    class="bg-white text-warning rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm"
+                                    style="width: 48px; height: 48px;">
+                                    <span class="material-symbols-outlined">star</span>
+                                </span>
+                            </div>
+                            <h2 class="display-5 fw-bold mb-1 text-dark">{{ shortlisted }}</h2>
+                            <p class="mb-0 text-muted fw-bold text-uppercase mt-auto shadow-sm-text"
+                                style="letter-spacing: 0.5px; font-size: 13px;">Students Shortlisted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card stat-card stat-card-drives text-center h-100">
+                        <h2 class="display-4 fw-bold mb-2">{{ drives }}</h2>
+                        <p class="mb-0 text-uppercase fw-bold"
+                            style="letter-spacing: 1px; font-size: 14px; opacity: 0.9;">Drives Created</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card stat-card-apps text-center h-100">
+                        <h2 class="display-4 fw-bold mb-2">{{ applications }}</h2>
+                        <p class="mb-0 text-uppercase fw-bold"
+                            style="letter-spacing: 1px; font-size: 14px; opacity: 0.9;">Applications Received</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card stat-card-short text-center h-100">
+                        <h2 class="display-4 fw-bold mb-2 text-dark">{{ shortlisted }}</h2>
+                        <p class="mb-0 text-uppercase fw-bold"
+                            style="letter-spacing: 1px; font-size: 14px; opacity: 0.9;">Students Shortlisted</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-0 shadow-sm border-0 rounded-4 overflow-hidden mb-5">
+                <div class="p-4 bg-light border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-secondary d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">work</span>
+                        Your Placement Drives
+                    </h5>
+                    {% if company.approval_status == 'approved' %}
+                    <a href="{{ url_for('company.create_drive') }}"
+                        class="btn btn-sm btn-primary shadow-sm d-flex align-items-center gap-2"
+                        style="border-radius: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">add</span> Create New Drive
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 custom-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Drive Title</th>
+                                <th>Status</th>
+                                <th>Applications</th>
+                                <th>Deadline</th>
+                                <th class="pe-4 text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for drive in my_drives %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center text-primary"
+                                            style="width: 40px; height: 40px;">
+                                            <span class="material-symbols-outlined">business_center</span>
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">{{ drive.job_title }}</span>
+                                            <span class="text-muted small">ID: #{{ drive.id }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span
+                                        class="badge badge-{{ drive.status }} px-3 py-2 rounded-pill d-inline-flex align-items-center"
+                                        style="font-size: 13px;">
+                                        <span class="material-symbols-outlined align-middle me-1"
+                                            style="font-size: 16px;">
+                                            {% if drive.status == 'approved' %}visibility
+                                            {% elif drive.status == 'pending' %}edit_document
+                                            {% else %}lock{% endif %}
+                                        </span>
+                                        {{ drive.status | upper }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="material-symbols-outlined text-muted"
+                                            style="font-size: 18px;">group</span>
+                                        <span class="fw-bold">{{ drive.applications.count() }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="material-symbols-outlined text-muted"
+                                            style="font-size: 18px;">calendar_today</span>
+                                        <span>{{ drive.deadline.strftime('%d %b %Y') if drive.deadline else 'Not set'
+                                            }}</span>
+                                    </div>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="d-flex gap-2 justify-content-end align-items-center">
+                                        <a href="{{ url_for('company.view_applicants', id=drive.id) }}"
+                                            class="btn btn-sm btn-light border d-flex align-items-center gap-2"
+                                            style="border-radius: 8px;">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size: 16px;">groups</span> View Applicants
+                                        </a>
+
+                                        {% if drive.status == 'pending' %}
+                                        <a href="{{ url_for('company.edit_drive', id=drive.id) }}"
+                                            class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2"
+                                            style="border-radius: 8px;">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                                            Edit
+                                        </a>
+                                        {% endif %}
+
+                                        {% if drive.status != 'closed' %}
+                                        <form method="POST" action="{{ url_for('company.close_drive', id=drive.id) }}"
+                                            class="d-inline m-0">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit"
+                                                class="btn btn-sm btn-outline-warning d-flex align-items-center gap-2"
+                                                onclick="return confirm('Close this drive? Students will no longer be able to apply.');"
+                                                style="border-radius: 8px;">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size: 16px;">block</span> Close
+                                            </button>
+                                        </form>
+                                        {% endif %}
+
+                                        <form method="POST" action="{{ url_for('company.delete_drive', id=drive.id) }}"
+                                            class="d-inline m-0">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit"
+                                                class="btn btn-sm btn-outline-danger d-flex align-items-center gap-2"
+                                                onclick="return confirm('Delete this drive completely? This cannot be undone.');"
+                                                style="border-radius: 8px;">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size: 16px;">delete</span> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="d-flex flex-column align-items-center text-muted">
+                                        <span class="material-symbols-outlined mb-2"
+                                            style="font-size: 48px; opacity: 0.5;">inbox</span>
+                                        <p class="mb-0">You haven't created any placement drives yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Admin</span>Panel
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('admin.manage_students') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_students' or request.endpoint == 'admin.view_student' or request.endpoint == 'admin.edit_student' %}active{% endif %}">
+            Manage Students
+        </a>
+        <a href="{{ url_for('admin.manage_companies') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_companies' or request.endpoint == 'admin.view_company' or request.endpoint == 'admin.edit_company' %}active{% endif %}">
+            Manage Companies
+        </a>
+        <a href="{{ url_for('admin.manage_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_drives' or request.endpoint == 'admin.view_drive' %}active{% endif %}">
+            Manage Drives
+        </a>
+        <a href="{{ url_for('admin.all_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.all_applications' or request.endpoint == 'admin.view_application' or request.endpoint == 'admin.edit_application' %}active{% endif %}">
+            All Applications
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('admin.view_application', id=application.id) }}"
+                    class="btn btn-sm btn-light border d-flex align-items-center justify-content-center pt-2 pb-2"
+                    style="width: 40px; border-radius: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+                </a>
+                <h4 class="mb-0 fw-bold" style="color: var(--secondary);">Edit Application Status</h4>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">Admin</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="row w-100 m-0">
+            <div class="col-lg-6 col-md-8 p-0">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary"
+                                style="width: 48px; height: 48px;">
+                                <span class="material-symbols-outlined" style="font-size: 24px;">edit_document</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0 text-secondary">Update Status</h5>
+                                <p class="text-muted small mb-0">Application #{{ application.id }}</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 bg-light p-3 rounded-3 border">
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined text-muted"
+                                        style="font-size: 16px;">person</span>
+                                    <span class="small text-muted fw-bold" style="width: 80px;">Student:</span>
+                                    <span class="fw-bold">{{ application.student_details.full_name }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined text-muted"
+                                        style="font-size: 16px;">work</span>
+                                    <span class="small text-muted fw-bold" style="width: 80px;">Role:</span>
+                                    <span>{{ application.drive_details.job_title }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined text-muted"
+                                        style="font-size: 16px;">business</span>
+                                    <span class="small text-muted fw-bold" style="width: 80px;">Company:</span>
+                                    <span>{{ application.drive_details.company_details.company_name }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                            <div class="mb-4">
+                                <label class="form-label text-muted small fw-bold">Application Status <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 text-muted">
+                                        <i class="bi bi-tag"></i>
+                                    </span>
+                                    <select name="status" class="form-select input-field border-start-0 ps-0"
+                                        style="cursor: pointer;">
+                                        <option value="pending" {% if application.status=='pending' %}selected{% endif
+                                            %}>Pending</option>
+                                        <option value="shortlisted" {% if application.status=='shortlisted' %}selected{%
+                                            endif %}>Shortlisted</option>
+                                        <option value="selected" {% if application.status=='selected' %}selected{% endif
+                                            %}>Selected</option>
+                                        <option value="rejected" {% if application.status=='rejected' %}selected{% endif
+                                            %}>Rejected</option>
+                                        <option value="withdrawn" {% if application.status=='withdrawn' %}selected{%
+                                            endif %}>Withdrawn</option>
+                                        <option value="applied" {% if application.status=='applied' %}selected{% endif
+                                            %}>Applied</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3 justify-content-end mt-4 pt-3 border-top">
+                                <a href="{{ url_for('admin.view_application', id=application.id) }}"
+                                    class="btn btn-light fw-bold px-4" style="border-radius: 8px;">Cancel</a>
+                                <button type="submit"
+                                    class="btn btn-primary d-flex align-items-center gap-2 shadow-sm px-4"
+                                    style="border-radius: 8px; font-weight: 600;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Save
+                                    Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

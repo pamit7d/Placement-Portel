@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('student.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('student.browse_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'student.browse_drives' or request.endpoint == 'student.view_drive' %}active{% endif %}">
+            Browse Drives
+        </a>
+        <a href="{{ url_for('student.my_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'student.my_applications' or request.endpoint in ['student.application_status', 'student.application_detail', 'student.view_application'] %}active{% endif %}">
+            My Applications
+        </a>
+        <a href="{{ url_for('student.edit_profile') }}"
+            class="sidebar-link mt-5 {% if request.endpoint == 'student.edit_profile' %}active{% endif %}">
+            Profile
+        </a>
+    </div>
+
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center">
+            <div class="topbar-title-container">
+                {% if student and student.profile_picture %}
+                <img src="{{ url_for('static', filename=student.profile_picture) }}" alt="Profile" class="topbar-logo-img" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                <div class="topbar-avatar" style="background: linear-gradient(135deg, var(--primary) 0%, #FF8E53 100%) !important;">
+                    <span style="font-size: 1.2rem;">👨‍🎓</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h4 class="topbar-title">Student Portal</h4>
+                    <p class="topbar-subtitle">Welcome back</p>
+                </div>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Stats Row -->
+        <h5 class="fw-bold mb-4 text-secondary">Overview</h5>
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 position-relative overflow-hidden"
+                    style="background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);">
+                    <!-- Decorative background element -->
+                    <div class="position-absolute"
+                        style="right: -20px; bottom: -20px; opacity: 0.1; transform: rotate(-15deg);">
+                        <span class="material-symbols-outlined"
+                            style="font-size: 150px; color: white;">assignment</span>
+                    </div>
+
+                    <div class="position-relative z-1 d-flex flex-column h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center justify-content-center rounded-3 bg-white bg-opacity-25"
+                                style="width: 48px; height: 48px; backdrop-filter: blur(4px);">
+                                <span class="material-symbols-outlined text-white"
+                                    style="font-size: 24px;">assignment_ind</span>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <h2 class="display-5 fw-bold mb-0 text-white"
+                                style="font-weight: 800; letter-spacing: -1px;">{{ total_applications }}</h2>
+                            <p class="mb-0 text-white text-opacity-75 fw-bold"
+                                style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Total
+                                Applications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 position-relative overflow-hidden"
+                    style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%);">
+                    <!-- Decorative background element -->
+                    <div class="position-absolute"
+                        style="right: -20px; bottom: -20px; opacity: 0.1; transform: rotate(-15deg);">
+                        <span class="material-symbols-outlined" style="font-size: 150px; color: white;">star</span>
+                    </div>
+
+                    <div class="position-relative z-1 d-flex flex-column h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center justify-content-center rounded-3 bg-white bg-opacity-25"
+                                style="width: 48px; height: 48px; backdrop-filter: blur(4px);">
+                                <span class="material-symbols-outlined text-white"
+                                    style="font-size: 24px;">star_half</span>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <h2 class="display-5 fw-bold mb-0 text-white"
+                                style="font-weight: 800; letter-spacing: -1px;">{{ shortlisted }}</h2>
+                            <p class="mb-0 text-white text-opacity-75 fw-bold"
+                                style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Shortlisted
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 position-relative overflow-hidden"
+                    style="background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);">
+                    <!-- Decorative background element -->
+                    <div class="position-absolute"
+                        style="right: -20px; bottom: -20px; opacity: 0.1; transform: rotate(-15deg);">
+                        <span class="material-symbols-outlined"
+                            style="font-size: 150px; color: white;">workspace_premium</span>
+                    </div>
+
+                    <div class="position-relative z-1 d-flex flex-column h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center justify-content-center rounded-3 bg-white bg-opacity-25"
+                                style="width: 48px; height: 48px; backdrop-filter: blur(4px);">
+                                <span class="material-symbols-outlined text-white"
+                                    style="font-size: 24px;">verified</span>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <h2 class="display-5 fw-bold mb-0 text-white"
+                                style="font-weight: 800; letter-spacing: -1px;">{{ selected }}</h2>
+                            <p class="mb-0 text-white text-opacity-75 fw-bold"
+                                style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Offers
+                                Received</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Recent Drives -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-column">
+                    <div class="bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold d-flex align-items-center gap-2" style="color: #0f172a;">
+                            <span class="material-symbols-outlined text-primary"
+                                style="font-size: 20px;">new_releases</span> New Drives
+                        </h6>
+                        <a href="{{ url_for('student.browse_drives') }}"
+                            class="small text-decoration-none fw-bold px-3 py-1 rounded-pill bg-light hover-bg-light-dark"
+                            style="color: var(--secondary); transition: all 0.2s;">
+                            View All
+                        </a>
+                    </div>
+                    <ul class="list-group list-group-flush flex-grow-1">
+                        {% for drive in recent_drives %}
+                        <li class="list-group-item p-4 d-flex justify-content-between align-items-center border-bottom-0"
+                            style="border-bottom: 1px solid #f1f5f9 !important; transition: background-color 0.2s;"
+                            onmouseover="this.style.backgroundColor='#f8fafc'"
+                            onmouseout="this.style.backgroundColor='white'">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center text-muted fw-bold shrink-0"
+                                    style="width: 40px; height: 40px; font-size: 14px;">
+                                    {{ drive.company_details.company_name[:1] | upper }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-dark fw-bold" style="font-size: 15px;">{{ drive.job_title }}
+                                    </h6>
+                                    <p class="text-muted small mb-0 d-flex align-items-center gap-1">
+                                        <span class="material-symbols-outlined" style="font-size: 12px;">business</span>
+                                        {{ drive.company_details.company_name }}
+                                        <span class="mx-1">•</span>
+                                        <span class="material-symbols-outlined"
+                                            style="font-size: 12px;">location_on</span> {{ drive.location }}
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="badge position-static rounded-pill px-2 py-1 align-self-start mt-1"
+                                style="background-color: #e0f2fe; color: #0284c7; font-size: 10px; border: 1px solid #bae6fd;">NEW</span>
+                        </li>
+                        {% else %}
+                        <li
+                            class="list-group-item p-5 text-center text-muted d-flex flex-column align-items-center justify-content-center h-100">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3 text-muted"
+                                style="width: 64px; height: 64px;">
+                                <span class="material-symbols-outlined" style="font-size: 28px;">inbox</span>
+                            </div>
+                            <p class="mb-0 fw-bold">No recent drives available.</p>
+                            <p class="small text-muted mt-1">Check back later for new opportunities.</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- My Recent Applications -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-column">
+                    <div class="bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold d-flex align-items-center gap-2" style="color: #0f172a;">
+                            <span class="material-symbols-outlined text-success" style="font-size: 20px;">history</span>
+                            Recent Applications
+                        </h6>
+                        <a href="{{ url_for('student.my_applications') }}"
+                            class="small text-decoration-none fw-bold px-3 py-1 rounded-pill bg-light hover-bg-light-dark"
+                            style="color: var(--secondary); transition: all 0.2s;">
+                            Timeline
+                        </a>
+                    </div>
+                    <ul class="list-group list-group-flush flex-grow-1">
+                        {% for app in my_applications %}
+                        <li class="list-group-item p-4 d-flex justify-content-between align-items-center"
+                            style="border-bottom: 1px solid #f1f5f9 !important; transition: background-color 0.2s;"
+                            onmouseover="this.style.backgroundColor='#f8fafc'"
+                            onmouseout="this.style.backgroundColor='white'">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shrink-0 shadow-sm"
+                                    style="width: 40px; height: 40px; font-size: 14px; background: linear-gradient(135deg, var(--secondary) 0%, #334155 100%);">
+                                    {{ app.drive_details.company_details.company_name[:1] | upper }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-dark fw-bold" style="font-size: 15px;">{{
+                                        app.drive_details.job_title }}</h6>
+                                    <p class="text-muted small mb-0 d-flex align-items-center gap-1">
+                                        <span class="material-symbols-outlined" style="font-size: 12px;">business</span>
+                                        {{ app.drive_details.company_details.company_name }}
+                                        <span class="mx-1">•</span>
+                                        <span class="material-symbols-outlined" style="font-size: 12px;">event</span> {{
+                                        app.application_date.strftime('%b %d') }}
+                                    </p>
+                                </div>
+                            </div>
+                            {% if app.status == 'applied' %}
+                            <span
+                                class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-1 rounded-pill shadow-sm"
+                                style="font-size: 10px; letter-spacing: 0.5px;">APPLIED</span>
+                            {% elif app.status == 'shortlisted' %}
+                            <span
+                                class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-1 rounded-pill shadow-sm"
+                                style="font-size: 10px; letter-spacing: 0.5px;">SHORTLISTED</span>
+                            {% elif app.status == 'selected' %}
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1 rounded-pill shadow-sm"
+                                style="font-size: 10px; letter-spacing: 0.5px;">SELECTED</span>
+                            {% elif app.status == 'rejected' %}
+                            <span
+                                class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-1 rounded-pill shadow-sm"
+                                style="font-size: 10px; letter-spacing: 0.5px;">REJECTED</span>
+                            {% else %}
+                            <span
+                                class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-1 rounded-pill shadow-sm"
+                                style="font-size: 10px; letter-spacing: 0.5px;">{{ app.status | upper }}</span>
+                            {% endif %}
+                        </li>
+                        {% else %}
+                        <li
+                            class="list-group-item p-5 text-center text-muted d-flex flex-column align-items-center justify-content-center h-100">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3 text-muted"
+                                style="width: 64px; height: 64px;">
+                                <span class="material-symbols-outlined" style="font-size: 28px;">send</span>
+                            </div>
+                            <p class="mb-0 fw-bold">No applications yet.</p>
+                            <p class="small text-muted mt-1">Start browsing drives to apply.</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

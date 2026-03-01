@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('admin.manage_students') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_students' or request.endpoint == 'admin.view_student' or request.endpoint == 'admin.edit_student' %}active{% endif %}">
+            Manage Students
+        </a>
+        <a href="{{ url_for('admin.manage_companies') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_companies' or request.endpoint == 'admin.view_company' or request.endpoint == 'admin.edit_company' %}active{% endif %}">
+            Manage Companies
+        </a>
+        <a href="{{ url_for('admin.manage_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.manage_drives' or request.endpoint == 'admin.view_drive' %}active{% endif %}">
+            Manage Drives
+        </a>
+        <a href="{{ url_for('admin.all_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'admin.all_applications' or request.endpoint == 'admin.view_application' or request.endpoint == 'admin.edit_application' %}active{% endif %}">
+            All Applications
+        </a>
+        <a href="#" onclick="alert('Settings page is not implemented.')" class="sidebar-link mt-5">
+            Settings
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center">
+            <div class="topbar-title-container">
+                <div class="topbar-avatar"
+                    style="background: linear-gradient(135deg, var(--primary) 0%, #FF8E53 100%) !important;">
+                    <span style="font-size: 1.2rem;">🏢</span>
+                </div>
+                <div>
+                    <h4 class="topbar-title">Manage Companies</h4>
+                    <p class="topbar-subtitle">View and manage registered companies</p>
+                </div>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Filters -->
+        <div class="d-flex justify-content-end mb-4 gap-3">
+            <form class="d-flex align-items-center bg-white rounded-3 px-3 py-1 border" method="GET"
+                action="{{ url_for('admin.manage_companies') }}" style="width: 280px; height: 42px;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <span class="material-symbols-outlined text-muted" style="font-size: 18px;">search</span>
+                <input type="text" name="search" class="form-control border-0 bg-transparent shadow-none"
+                    placeholder="Search company..." value="{{ request.args.get('search', '') }}"
+                    style="font-size: 14px;">
+            </form>
+
+            <form method="GET" action="{{ url_for('admin.manage_companies') }}" id="statusFilterForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="status" class="form-select border shadow-sm" style="height: 42px; font-size: 14px;"
+                    onchange="document.getElementById('statusFilterForm').submit()">
+                    <option value="All" {% if current_status=='All' %}selected{% endif %}>All Status</option>
+                    <option value="Pending" {% if current_status=='Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Approved" {% if current_status=='Approved' %}selected{% endif %}>Approved</option>
+                    <option value="Blacklisted" {% if current_status=='Blacklisted' %}selected{% endif %}>Blacklisted
+                    </option>
+                </select>
+                {% if request.args.get('search') %}
+                <input type="hidden" name="search" value="{{ request.args.get('search') }}">
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="custom-table-card">
+            <div class="d-flex align-items-center justify-content-between p-4 border-bottom">
+                <h5 class="fw-bold m-0" style="color: #0f172a;">Registered Companies</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th>Company Name</th>
+                            <th>HR Contact</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for company in companies.items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                                        style="width: 40px; height: 40px; font-size: 1rem; flex-shrink: 0;">
+                                        {{ company.company_name[:1] | upper }}
+                                    </div>
+                                    <span class="fw-bold text-dark">{{ company.company_name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined text-muted"
+                                        style="font-size: 18px;">person</span>
+                                    {{ company.hr_name }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 14px;">
+                                    <span class="material-symbols-outlined" style="font-size: 16px;">mail</span>
+                                    {{ company.user.email }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if company.approval_status == 'pending' %}
+                                <span
+                                    class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 rounded-pill"><i
+                                        class="bi bi-clock-history me-1"></i> Pending</span>
+                                {% elif company.approval_status == 'approved' %}
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill"><i
+                                        class="bi bi-check-circle me-1"></i> Approved</span>
+                                {% elif company.approval_status == 'rejected' %}
+                                <span
+                                    class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill"><i
+                                        class="bi bi-x-circle me-1"></i> Rejected</span>
+                                {% elif company.approval_status == 'blacklisted' %}
+                                <span
+                                    class="badge bg-dark bg-opacity-10 text-dark border border-dark border-opacity-25 px-3 py-2 rounded-pill"><i
+                                        class="bi bi-slash-circle me-1"></i> Blacklisted</span>
+                                {% else %}
+                                <span
+                                    class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill">{{
+                                    company.approval_status | title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <form method="POST"
+                                        action="{{ url_for('admin.update_company', id=company.id, action=company.approval_status) }}"
+                                        class="m-0" id="statusForm-{{ company.id }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <select name="status" class="form-select border shadow-sm"
+                                            style="width: 140px; font-size: 13px; border-radius: 8px;" onchange="
+                                                let form = document.getElementById('statusForm-{{ company.id }}');
+                                                let action = this.value;
+                                                form.action = '/admin/company/{{ company.id }}/' + action;
+                                                form.submit();
+                                            ">
+                                            <option value="pending" {% if company.approval_status=='pending'
+                                                %}selected{% endif %}>Pending</option>
+                                            <option value="approved" {% if company.approval_status=='approved'
+                                                %}selected{% endif %}>Approved</option>
+                                            <option value="blacklisted" {% if company.approval_status=='blacklisted'
+                                                %}selected{% endif %}>Blacklisted</option>
+                                            <option value="rejected" {% if company.approval_status=='rejected'
+                                                %}selected{% endif %}>Rejected</option>
+                                        </select>
+                                    </form>
+
+                                    <a href="{{ url_for('admin.view_company', id=company.id) }}"
+                                        class="btn btn-sm btn-light border d-flex align-items-center justify-content-center shadow-sm"
+                                        style="width: 36px; height: 36px; border-radius: 8px;" title="View Details">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size: 18px; color: var(--primary);">visibility</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <div class="mb-3">
+                                    <div class="d-inline-flex bg-light rounded-circle p-4 border shadow-sm">
+                                        <span class="material-symbols-outlined text-muted"
+                                            style="font-size: 32px;">domain_disabled</span>
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-1">No companies found</h6>
+                                <p class="small text-muted mb-0">There are no companies matching your current filters.
+                                </p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            {% if companies.pages > 1 %}
+            <div class="p-3 border-top bg-light rounded-bottom-4 d-flex justify-content-center">
+                <nav aria-label="Company pagination">
+                    <ul class="pagination pagination-sm m-0">
+                        {% if companies.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="{{ url_for('admin.manage_companies', page=companies.prev_num, search=request.args.get('search', ''), status=request.args.get('status', 'All')) }}">Previous</a>
+                        </li>
+                        {% endif %}
+
+                        <li class="page-item disabled"><span class="page-link border-0 bg-transparent text-muted">Page
+                                {{ companies.page }} of {{ companies.pages }}</span></li>
+
+                        {% if companies.has_next %}
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="{{ url_for('admin.manage_companies', page=companies.next_num, search=request.args.get('search', ''), status=request.args.get('status', 'All')) }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

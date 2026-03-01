@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('student.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('student.browse_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'student.browse_drives' or request.endpoint == 'student.view_drive' %}active{% endif %}">
+            Browse Drives
+        </a>
+        <a href="{{ url_for('student.my_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'student.my_applications' or request.endpoint in ['student.application_status', 'student.application_detail', 'student.view_application'] %}active{% endif %}">
+            My Applications
+        </a>
+        <a href="{{ url_for('student.edit_profile') }}"
+            class="sidebar-link mt-5 {% if request.endpoint == 'student.edit_profile' %}active{% endif %}">
+            Profile
+        </a>
+    </div>
+
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('student.my_applications') }}"
+                    class="btn btn-sm btn-light border d-flex align-items-center justify-content-center pt-2 pb-2"
+                    style="width: 40px; border-radius: 10px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+                </a>
+                <h4 class="mb-0 fw-bold" style="color: var(--secondary);">Application Details</h4>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="card p-0 shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+            <div
+                class="p-4 p-md-5 bg-primary bg-opacity-10 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-4">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-4 w-100">
+                    {% if application.drive_details.company_details.logo_path %}
+                    <div class="bg-white rounded-4 shadow-sm d-flex align-items-center justify-content-center p-2"
+                        style="width: 90px; height: 90px; border: 1px solid rgba(67, 97, 238, 0.1);">
+                        <img src="{{ url_for('static', filename=application.drive_details.company_details.logo_path) }}"
+                            alt="Logo" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                    </div>
+                    {% else %}
+                    <div class="bg-white rounded-4 shadow-sm d-flex align-items-center justify-content-center text-primary fw-bold"
+                        style="width: 90px; height: 90px; font-size: 32px; border: 1px solid rgba(67, 97, 238, 0.1);">
+                        {{ application.drive_details.company_details.company_name[:1] | upper }}
+                    </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <h3 class="fw-bold mb-2 text-secondary" style="font-size: 1.8rem; letter-spacing: -0.5px;">{{
+                            application.drive_details.job_title }}</h3>
+                        <div
+                            class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom border-primary border-opacity-10">
+                            <span class="material-symbols-outlined text-primary"
+                                style="font-size: 20px;">business</span>
+                            <h5 class="mb-0 fw-bold" style="color: var(--primary);">{{
+                                application.drive_details.company_details.company_name }}</h5>
+                        </div>
+                        <div class="d-flex flex-wrap gap-3">
+                            <span
+                                class="d-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm text-muted small border">
+                                <span class="material-symbols-outlined text-primary"
+                                    style="font-size: 16px;">event</span> Applied:
+                                <span class="fw-bold text-dark">{{ application.application_date.strftime('%d %b %Y')
+                                    }}</span>
+                            </span>
+                            {% if application.status == 'applied' %}
+                            <span
+                                class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill shadow-sm d-inline-flex align-items-center"
+                                style="font-size: 13px; letter-spacing: 0.5px;"><i class="bi bi-send me-1"></i>
+                                APPLIED</span>
+                            {% elif application.status == 'shortlisted' %}
+                            <span
+                                class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 rounded-pill shadow-sm d-inline-flex align-items-center"
+                                style="font-size: 13px; letter-spacing: 0.5px;"><i class="bi bi-star me-1"></i>
+                                SHORTLISTED</span>
+                            {% elif application.status == 'selected' %}
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill shadow-sm d-inline-flex align-items-center"
+                                style="font-size: 13px; letter-spacing: 0.5px;"><i class="bi bi-trophy me-1"></i>
+                                SELECTED</span>
+                            {% elif application.status == 'rejected' %}
+                            <span
+                                class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill shadow-sm d-inline-flex align-items-center"
+                                style="font-size: 13px; letter-spacing: 0.5px;"><i class="bi bi-x-circle me-1"></i>
+                                REJECTED</span>
+                            {% else %}
+                            <span
+                                class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill shadow-sm d-inline-flex align-items-center"
+                                style="font-size: 13px; letter-spacing: 0.5px;">{{ application.status | upper }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-md-end ms-md-auto mt-4 mt-md-0 w-100 w-md-auto">
+                    {% if application.status == 'applied' %}
+                    <span
+                        class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill"
+                        style="font-size: 14px; letter-spacing: 0.5px;"><i class="bi bi-send me-1"></i> Applied</span>
+                    {% elif application.status == 'shortlisted' %}
+                    <span
+                        class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 rounded-pill"
+                        style="font-size: 14px; letter-spacing: 0.5px;"><i class="bi bi-star me-1"></i>
+                        Shortlisted</span>
+                    {% elif application.status == 'selected' %}
+                    <span
+                        class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill"
+                        style="font-size: 14px; letter-spacing: 0.5px;"><i class="bi bi-trophy me-1"></i>
+                        Selected</span>
+                    {% elif application.status == 'rejected' %}
+                    <span
+                        class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill"
+                        style="font-size: 14px; letter-spacing: 0.5px;"><i class="bi bi-x-circle me-1"></i>
+                        Rejected</span>
+                    {% else %}
+                    <span
+                        class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill"
+                        style="font-size: 14px; letter-spacing: 0.5px;">{{ application.status|title }}</span>
+                    {% endif %}
+
+                    {% if application.status == 'applied' %}
+                    <div class="d-flex justify-content-end w-100">
+                        <form action="{{ url_for('student.withdraw_application', id=application.id) }}" method="POST"
+                            onsubmit="return confirm('Are you sure you want to withdraw this application? This action cannot be undone.');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit"
+                                class="btn btn-outline-danger d-flex align-items-center gap-2 px-4 py-2 mt-2 bg-white"
+                                style="border-radius: 8px; font-weight: 600; transition: all 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">cancel</span> Withdraw
+                                Application
+                            </button>
+                        </form>
+                    </div>
+                    {% elif application.status != 'applied' %}
+                    <div
+                        class="mt-2 text-muted small d-flex align-items-center gap-1 justify-content-md-end bg-white p-2 rounded border">
+                        <span class="material-symbols-outlined text-warning" style="font-size: 16px;">info</span>
+                        Withdrawal unavailable for <strong class="text-dark">{{ application.status|title }}</strong>
+                        status.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="p-4 p-md-5">
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="p-4 bg-light rounded-3 border h-100">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-success"
+                                    style="width: 44px; height: 44px;">
+                                    <span class="material-symbols-outlined" style="font-size: 22px;">payments</span>
+                                </div>
+                                <div>
+                                    <p class="mb-0 small text-muted fw-bold text-uppercase"
+                                        style="letter-spacing: 0.5px;">CTC Range</p>
+                                    <p class="mb-0 fw-bold fs-5 text-dark">{{ application.drive_details.ctc_range }}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-info"
+                                    style="width: 44px; height: 44px;">
+                                    <span class="material-symbols-outlined" style="font-size: 22px;">location_on</span>
+                                </div>
+                                <div>
+                                    <p class="mb-0 small text-muted fw-bold text-uppercase"
+                                        style="letter-spacing: 0.5px;">Location</p>
+                                    <p class="mb-0 fw-bold fs-5 text-dark">{{ application.drive_details.location }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-4 bg-light rounded-3 border h-100">
+                            <h6 class="fw-bold text-secondary mb-3 d-flex align-items-center gap-2">
+                                <span class="material-symbols-outlined text-primary"
+                                    style="font-size: 20px;">school</span> Eligibility Criteria
+                            </h6>
+                            <p class="mb-0 text-dark" style="color: #475569; line-height: 1.6;">{{
+                                application.drive_details.eligibility or 'Not specified by the company.' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h6 class="fw-bold text-secondary mb-3 d-flex align-items-center gap-2 pb-2 border-bottom">
+                        <span class="material-symbols-outlined text-warning" style="font-size: 20px;">description</span>
+                        Job Description
+                    </h6>
+                    <div class="preview-content p-4 bg-light rounded-3 border font-monospace text-dark"
+                        style="white-space: pre-wrap; font-size: 14px; line-height: 1.7; width: 100%;">{{
+                        application.drive_details.description }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

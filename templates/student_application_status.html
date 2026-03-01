@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block layout %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-header">
+            <span style="color: var(--primary);">Recruit</span>Plus
+        </div>
+        <a href="{{ url_for('student.dashboard') }}"
+            class="sidebar-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+            Dashboard
+        </a>
+        <a href="{{ url_for('student.browse_drives') }}"
+            class="sidebar-link {% if request.endpoint == 'student.browse_drives' or request.endpoint == 'student.view_drive' %}active{% endif %}">
+            Browse Drives
+        </a>
+        <a href="{{ url_for('student.my_applications') }}"
+            class="sidebar-link {% if request.endpoint == 'student.my_applications' or request.endpoint in ['student.application_status', 'student.application_detail', 'student.view_application'] %}active{% endif %}">
+            My Applications
+        </a>
+        <a href="{{ url_for('student.edit_profile') }}"
+            class="sidebar-link mt-5 {% if request.endpoint == 'student.edit_profile' %}active{% endif %}">
+            Profile
+        </a>
+    </div>
+
+    <div class="main-content flex-grow-1">
+        <!-- Topbar -->
+        <div class="dashboard-topbar d-flex justify-content-between align-items-center">
+            <div class="topbar-title-container">
+                {% if student and student.profile_picture %}
+                <img src="{{ url_for('static', filename=student.profile_picture) }}" alt="Profile" class="topbar-logo-img" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                <div class="topbar-avatar" style="background: linear-gradient(135deg, var(--primary) 0%, #FF8E53 100%) !important;">
+                    <span style="font-size: 1.2rem;">👨‍🎓</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h4 class="topbar-title">Student Portal</h4>
+                    <p class="topbar-subtitle">Welcome back</p>
+                </div>
+            </div>
+
+            <div class="topbar-user-section">
+                <span class="topbar-username">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout-styled">Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Timeline List -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4 mb-lg-0">
+                    <h5 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-3 border-bottom">
+                        <span class="material-symbols-outlined text-primary pb-1"
+                            style="font-size: 22px;">history</span> Application History
+                    </h5>
+
+                    {% for app in applications %}
+                    <div class="d-flex mb-4 position-relative">
+                        <!-- Timeline Line -->
+                        {% if not loop.last %}
+                        <div class="position-absolute"
+                            style="left: 20px; top: 40px; bottom: -24px; width: 2px; background-color: #e2e8f0; border-radius: 2px;">
+                        </div>
+                        {% endif %}
+
+                        <!-- Timeline Icon -->
+                        {% if app.drive_details.company_details.logo_path %}
+                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-white z-1 shadow-sm border"
+                            style="width: 42px; height: 42px; flex-shrink: 0; padding: 4px;">
+                            <img src="{{ url_for('static', filename=app.drive_details.company_details.logo_path) }}"
+                                alt="Logo" class="img-fluid rounded-circle"
+                                style="max-height: 100%; object-fit: contain;">
+                        </div>
+                        {% else %}
+                        <div class="rounded-circle d-flex text-white align-items-center justify-content-center fw-bold me-4 z-1 shadow-sm"
+                            style="width: 42px; height: 42px; flex-shrink: 0; background: linear-gradient(135deg, var(--secondary) 0%, #334155 100%);">
+                            {{ app.drive_details.company_details.company_name[:1] | upper }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Timeline Content -->
+                        <div class="flex-grow-1 bg-white p-4 rounded-4 border shadow-sm ms-3"
+                            style="transition: all 0.3s ease; border-color: #f1f5f9 !important;">
+                            <!-- Hover Effect styling -->
+                            <style>
+                                .flex-grow-1.bg-white:hover {
+                                    transform: translateX(5px);
+                                    border-color: #cbd5e1 !important;
+                                }
+                            </style>
+                            <div
+                                class="d-flex justify-content-between align-items-start mb-2 flex-column flex-sm-row gap-2">
+                                <div>
+                                    <h5 class="mb-1 text-dark fw-bold" style="font-size: 1.1rem;">{{
+                                        app.drive_details.job_title }}</h5>
+                                    <p class="text-muted fw-bold small mb-2 d-flex align-items-center gap-1">
+                                        <span class="material-symbols-outlined" style="font-size: 14px;">business</span>
+                                        {{ app.drive_details.company_details.company_name }}
+                                    </p>
+                                </div>
+                                {% if app.status == 'applied' %}
+                                <span
+                                    class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-1 rounded-pill"
+                                    style="font-size: 11px; letter-spacing: 0.5px;"><i class="bi bi-send me-1"></i>
+                                    APPLIED</span>
+                                {% elif app.status == 'shortlisted' %}
+                                <span
+                                    class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-1 rounded-pill"
+                                    style="font-size: 11px; letter-spacing: 0.5px;"><i class="bi bi-star me-1"></i>
+                                    SHORTLISTED</span>
+                                {% elif app.status == 'selected' %}
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1 rounded-pill"
+                                    style="font-size: 11px; letter-spacing: 0.5px;"><i class="bi bi-trophy me-1"></i>
+                                    SELECTED</span>
+                                {% elif app.status == 'rejected' %}
+                                <span
+                                    class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-1 rounded-pill"
+                                    style="font-size: 11px; letter-spacing: 0.5px;"><i class="bi bi-x-circle me-1"></i>
+                                    REJECTED</span>
+                                {% else %}
+                                <span
+                                    class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-1 rounded-pill"
+                                    style="font-size: 11px; letter-spacing: 0.5px;">{{ app.status | upper }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex flex-wrap text-muted small mt-3 pt-3 border-top gap-3">
+                                <span class="d-flex align-items-center gap-1 bg-light px-2 py-1 rounded">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size: 14px;">calendar_today</span>
+                                    Applied: <span class="fw-bold text-dark">{{ app.application_date.strftime('%b %d,
+                                        %Y') }}</span>
+                                </span>
+                                <span class="d-flex align-items-center gap-1 bg-light px-2 py-1 rounded">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">event</span>
+                                    Deadline: <span class="fw-bold text-dark">{{ app.drive_details.deadline.strftime('%b
+                                        %d, %Y') if app.drive_details.deadline else 'N/A' }}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 d-flex flex-column align-items-center justify-content-center">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3 text-muted"
+                            style="width: 80px; height: 80px;">
+                            <span class="material-symbols-outlined" style="font-size: 40px;">inbox</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">No Applications Yet</h5>
+                        <p class="text-muted mb-4">You haven't applied to any drives yet.</p>
+                        <a href="{{ url_for('student.browse_drives') }}"
+                            class="btn btn-primary px-4 py-2 d-flex align-items-center gap-2"
+                            style="border-radius: 8px; font-weight: 600;">
+                            Browse Open Drives <span class="material-symbols-outlined"
+                                style="font-size: 18px;">search</span>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-light h-100"
+                    style="border: 1px solid #e2e8f0 !important;">
+                    <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-3 border-bottom">
+                        <span class="material-symbols-outlined text-info pb-1" style="font-size: 20px;">info</span>
+                        Status Key
+                    </h6>
+                    <ul class="list-unstyled mb-0 text-muted small d-flex flex-column gap-3">
+                        <li class="d-flex align-items-start gap-3 bg-white p-3 rounded-3 shadow-sm border border-light">
+                            <span
+                                class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill"
+                                style="min-width: 100px; text-align: center;"><i class="bi bi-send me-1"></i>
+                                APPLIED</span>
+                            <span style="line-height: 1.5;">Application submitted successfully and is pending
+                                review.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-3 bg-white p-3 rounded-3 shadow-sm border border-light">
+                            <span
+                                class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 rounded-pill"
+                                style="min-width: 100px; text-align: center;"><i class="bi bi-star me-1"></i>
+                                SHORTLISTED</span>
+                            <span style="line-height: 1.5;">You have been shortlisted for tests/interviews.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-3 bg-white p-3 rounded-3 shadow-sm border border-light">
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill"
+                                style="min-width: 100px; text-align: center;"><i class="bi bi-trophy me-1"></i>
+                                SELECTED</span>
+                            <span style="line-height: 1.5;">Congratulations! You received an offer.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-3 bg-white p-3 rounded-3 shadow-sm border border-light">
+                            <span
+                                class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill"
+                                style="min-width: 100px; text-align: center;"><i class="bi bi-x-circle me-1"></i>
+                                REJECTED</span>
+                            <span style="line-height: 1.5;">Not selected for this drive. Keep trying!</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+# Python Bytecode and Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Flask Instance Folder
+instance/
+
+# Environment and Database
+.env
+*.sqlite3
+*.db
+
+# Uploads and Data
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Log Files and Test Results
+*.log
+test_results.txt
+
+# Ad-hoc and Maintenance Scripts
+test_*.py
+route_tester*.py
+run_test_server.py
+fix_*.py
+aesthetic*.py
+create_pages.py
+download_stitch.py
+remove_my_drives.py
+init_db.py
+seed_data.py
+
+# OS and IDE Settings
+.DS_Store
+.vscode/
+.idea/
+*.swp

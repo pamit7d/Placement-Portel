@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block layout %}
+<div class="d-flex">
+    <div class="main-content flex-grow-1" style="background-color: var(--light-bg); min-height: 100vh;">
+        <div class="container py-5">
+            <div class="card p-0 shadow-sm border-0 rounded-4"
+                style="max-width: 900px; margin: 0 auto; overflow: hidden;">
+                <!-- Header Area -->
+                <div class="bg-primary bg-opacity-10 px-4 py-4 px-md-5 py-md-5 position-relative border-bottom"
+                    style="border-color: rgba(67, 97, 238, 0.1) !important;">
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-primary fw-bold border"
+                            style="width: 80px; height: 80px; font-size: 28px;">
+                            <span class="material-symbols-outlined" style="font-size: 32px;">edit_document</span>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-1 text-secondary" style="font-size: 1.8rem; letter-spacing: -0.5px;">
+                                Edit Placement Drive</h3>
+                            <h6 class="mb-0 text-muted d-flex align-items-center gap-2">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">info</span> Update the
+                                details for {{ drive.job_title }}
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" class="p-4 p-md-5 bg-white">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Basic Details -->
+                    <div class="mb-5">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                            <span class="material-symbols-outlined text-primary" style="font-size: 22px;">work</span>
+                            Basic Details
+                        </h6>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Job Title <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-briefcase"></i>
+                                </span>
+                                <input type="text" name="job_title"
+                                    class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                    value="{{ drive.job_title }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Job Description <span
+                                    class="text-danger">*</span></label>
+                            <textarea name="description" class="form-control custom-textarea bg-light-focus" rows="5"
+                                required style="resize: vertical; min-height: 120px;">{{ drive.description }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Requirements -->
+                    <div class="mb-5">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                            <span class="material-symbols-outlined text-primary" style="font-size: 22px;">school</span>
+                            Requirements & Qualifications
+                        </h6>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Eligibility Criteria <span
+                                    class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-mortarboard"></i>
+                                </span>
+                                <input type="text" name="eligibility"
+                                    class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                    value="{{ drive.eligibility }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">Required Skills <span
+                                    class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-tools"></i>
+                                </span>
+                                <input type="text" name="required_skills"
+                                    class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                    value="{{ drive.required_skills }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase"
+                                style="letter-spacing: 0.5px;">CTC Range <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted fw-bold">₹</span>
+                                <input type="text" name="ctc_range"
+                                    class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                    value="{{ drive.ctc_range }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logistics -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-4 text-secondary d-flex align-items-center gap-2 pb-2 border-bottom">
+                            <span class="material-symbols-outlined text-primary"
+                                style="font-size: 22px;">location_on</span> Logistic Details
+                        </h6>
+
+                        <div class="row g-4 mb-2">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase"
+                                    style="letter-spacing: 0.5px;">Job Location <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </span>
+                                    <input type="text" name="location"
+                                        class="form-control input-field border-start-0 ps-0 bg-light-focus"
+                                        value="{{ drive.location }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase"
+                                    style="letter-spacing: 0.5px;">Application Deadline</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </span>
+                                    <input type="date" name="deadline"
+                                        class="form-control input-field border-start-0 ps-0 bg-light-focus cursor-pointer"
+                                        style="height: 48px;"
+                                        value="{{ drive.deadline.strftime('%Y-%m-%d') if drive.deadline else '' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
+                        <a href="{{ url_for('company.dashboard') }}" class="btn btn-light border px-4 py-2"
+                            style="border-radius: 8px; font-weight: 500;">Cancel</a>
+                        <button type="submit"
+                            class="btn btn-primary shadow-sm px-4 py-2 d-flex align-items-center gap-2"
+                            style="border-radius: 8px; font-weight: 600;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Update Drive
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

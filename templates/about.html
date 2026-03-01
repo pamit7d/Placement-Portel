@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center my-5">
+    <div class="col-md-8">
+        <div class="card p-5 border-0 shadow-sm custom-table-card">
+            <div class="text-center mb-5">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white mb-4 shadow" 
+                     style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--secondary) 0%, #007BB5 100%); font-size: 2.5rem;">
+                    <i class="bi bi-briefcase-fill"></i>R
+                </div>
+                <h1 class="fw-bold" style="color: var(--dark);">About <span style="color: var(--secondary);">Recruit</span><span style="color: var(--primary);">Plus</span></h1>
+                <p class="lead text-muted">Bridging the gap between exceptional talent and top-tier companies.</p>
+            </div>
+            
+            <h3 class="fw-bold mb-3 border-bottom pb-2">Our Mission</h3>
+            <p class="mb-4 text-muted" style="font-size: 1.1rem; line-height: 1.8;">
+                RecruitPlus was built with a single goal in mind: to simplify, streamline, and accelerate the campus placement process. 
+                We understand that navigating recruitment—whether you are a student looking for your dream job or a company searching for the perfect candidate—can be complex. 
+                Our platform provides a centralized, transparent, and highly efficient portal for all placement activities.
+            </p>
+            
+            <h3 class="fw-bold mb-3 border-bottom pb-2 mt-5">What We Do</h3>
+            <div class="row g-4 mt-2">
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded shadow-sm h-100 border-start border-4 border-primary">
+                        <h5 class="fw-bold">Empower Students</h5>
+                        <p class="text-muted small mb-0">Giving students the tools to craft professional profiles, build their resumes, and apply to multiple placement drives effortlessly.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded shadow-sm h-100 border-start border-4 border-secondary">
+                        <h5 class="fw-bold">Enable Recruiters</h5>
+                        <p class="text-muted small mb-0">Allowing companies to post jobs, easily review applications, and shortlist candidates with a few clicks.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
