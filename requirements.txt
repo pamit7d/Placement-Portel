@@ -5,3 +5,4 @@ Flask-WTF==1.2.1
 Werkzeug==2.3.8
 email-validator==2.1.0.post1
 blinker==1.7.0
+gunicorn==21.2.0
